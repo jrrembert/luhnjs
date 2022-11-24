@@ -5,7 +5,6 @@ function generate(value: string): string {
         throw new Error('string cannot be empty');
     }
 
-    const test = 'test'
     // convert to array
     const toArray = Array.from(value);
 

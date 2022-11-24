@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "compile": "tsc && node dist/index.js",
+    "build": "tsc && node dist/index.js",
     "lint": "eslint .",
     "test": "jest"
   },
