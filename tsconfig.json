@@ -8,5 +8,10 @@
         "moduleResolution": "node",
         "importHelpers": true,
         "outDir": "dist"
-      },
+    },
+    "include": [
+      "index.ts"
+    ]
+
+
 }
