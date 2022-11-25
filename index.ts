@@ -30,16 +30,16 @@ function generateCheckSum(value: string): number {
   // convert to array
   const toArray = Array.from(value);
 
-  // if double is true, multiply digit by 2
-  let double: boolean = true;
+  // if double is `true`, multiply digit by 2
+  let double = true;
 
-  // iterate through values, multiplying value by 2 for every 2nd digit
+  // starting from right, iterate through each value multiplying every 2nd digit by 2
   const sum = toArray.reduceRight((prev, current) => {
     if (double) {
       double = false;
       const temp = parseInt(current) * 2;
 
-      // if value is greater than or equal to 10, sum each digit ie. if value is 15, use 1 + 5 to get value
+      // if value is greater than or equal to 10, sum each digit of value ie. if value is 15, use 1 + 5 to get value
       if (temp >= 10) {
         return prev + Array.from(temp.toString()).reduce((prev, current) => {
           return prev + parseInt(current);
