@@ -1,6 +1,4 @@
-function generate(value: string): string {
-  console.log(value);
-
+function generate (value: string): string {
   if (!value.length) {
     throw new Error('string cannot be empty');
   }
@@ -27,6 +25,7 @@ function generate(value: string): string {
       return prev + parseInt(current) * 2;
     } 
     double = true;
+
     return prev + parseInt(current);
     
   }, 0);
@@ -36,6 +35,31 @@ function generate(value: string): string {
   return value.concat(checkDigit.toString());
 }
 
+/**
+ * Determine if the Luhn checkdigit for a given number is correct
+ * 
+ * @param value number containing a Luhn checkdigit
+ * @returns 
+ */
+function validate (value: string): boolean {
+  if (!value.length) {
+    throw new Error('string cannot be empty');
+  }
+
+  if (value.length === 1) {
+    throw new Error('string must be longer than 1 character');
+  }
+
+  if (isNaN(+value)) {
+    throw new Error('string must be convertible to a number');
+  }
+
+  const valueWithoutCheckDigit = value.substring(0, value.length - 1);
+
+  return value === generate(valueWithoutCheckDigit);
+}
+
 export default {
-  generate
+  generate,
+  validate,
 };
