@@ -20,7 +20,7 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           scope: '@jrrembert'
       - run: yarn run build --if-present
-      - run: yarn publish
+      - run: yarn publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
