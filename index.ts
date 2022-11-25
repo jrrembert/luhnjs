@@ -1,17 +1,41 @@
-function generate (value: string): string {
+class GenerateOptions {
+  public checkSumOnly: boolean;
+
+  constructor() {
+    this.checkSumOnly = false;
+  }
+}
+
+/**
+ * Verify string is correct length and can be converted to a number
+ *
+ * @param value potential value
+ */
+function handleErrors(value: string): void {
   if (!value.length) {
     throw new Error('string cannot be empty');
   }
 
+  if (isNaN(+value)) {
+    throw new Error('string must be convertible to a number');
+  }
+}
+
+/**
+ * Generate a checksum using Luhn algorithm
+ *
+ * @param value value to check
+ */
+function generateCheckSum(value: string): number {
   // convert to array
   const toArray = Array.from(value);
 
   // if double is true, multiply digit by 2
-  let double = true;
+  let double: boolean = true;
 
-  // iterate through value, multiplying value by 2 for every 2nd digit
+  // iterate through values, multiplying value by 2 for every 2nd digit
   const sum = toArray.reduceRight((prev, current) => {
-    if (double === true) {
+    if (double) {
       double = false;
       const temp = parseInt(current) * 2;
 
@@ -23,40 +47,47 @@ function generate (value: string): string {
       }
 
       return prev + parseInt(current) * 2;
-    } 
+    }
+
     double = true;
 
     return prev + parseInt(current);
-    
   }, 0);
 
-  const checkDigit = (10 - (sum % 10)) % 10;
-
-  return value.concat(checkDigit.toString());
+  return (10 - (sum % 10)) % 10;
 }
 
 /**
- * Determine if the Luhn checkdigit for a given number is correct
- * 
- * @param value number containing a Luhn checkdigit
- * @returns 
+ * Return value with checksum calculated using Luhn algorithm
+ *
+ * @param value value to check
+ * @param options.checkSumOnly determine if value + checksum, or only checksum should be returned
+ * @returns
  */
-function validate (value: string): boolean {
-  if (!value.length) {
-    throw new Error('string cannot be empty');
-  }
+function generate(value: string, options?: GenerateOptions): string {
+  handleErrors(value);
+
+  const checkSum = generateCheckSum(value).toString();
+
+  return options?.checkSumOnly ? checkSum : value.concat(checkSum);
+}
+
+/**
+ * Determine if the Luhn checksum for a given number is correct
+ *
+ * @param value number containing a Luhn checksum
+ * @returns
+ */
+function validate(value: string): boolean {
+  handleErrors(value);
 
   if (value.length === 1) {
     throw new Error('string must be longer than 1 character');
   }
 
-  if (isNaN(+value)) {
-    throw new Error('string must be convertible to a number');
-  }
+  const valueWithoutCheckSum = value.substring(0, value.length - 1);
 
-  const valueWithoutCheckDigit = value.substring(0, value.length - 1);
-
-  return value === generate(valueWithoutCheckDigit);
+  return value === generate(valueWithoutCheckSum);
 }
 
 export default {

@@ -1,7 +1,7 @@
 const rules = {
   '@typescript-eslint/no-unused-vars': [
-    'error', 
-    { 
+    'error',
+    {
       argsIgnorePattern: '^_',
     },
   ],
@@ -16,7 +16,7 @@ const rules = {
   'quotes': [
     'error',
     'single',
-    { 
+    {
       allowTemplateLiterals: true,
     },
   ],
@@ -35,18 +35,25 @@ const rules = {
   ],
   'space-before-function-paren': [
     'error',
-    'always',
+    {
+      'anonymous': 'always',
+      'named': 'never',
+      'asyncArrow': 'always',
+    },
   ],
   'padding-line-between-statements': [
     'error',
-    { 
-      blankLine: 'always', 
+    {
+      blankLine: 'always',
       prev: '*',
       next: 'return',
     },
   ],
+  'no-trailing-spaces': [
+    'error',
+  ],
 };
-  
+
 module.exports = {
   root: true,
   ignorePatterns: ['**/dist/**'],
@@ -60,7 +67,7 @@ module.exports = {
     ecmaVersion: 6,
     sourceType: 'module',
   },
-  env: { 
+  env: {
     es6: true,
     node: true,
   },
