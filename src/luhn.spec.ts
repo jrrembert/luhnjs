@@ -1,4 +1,4 @@
-const luhn = require('./index').default;
+import * as luhn from './luhn';
 
 describe('generate', () => {
   describe('when `options.checkSumOnly` is undefined/null', () => {
