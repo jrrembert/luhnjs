@@ -1,10 +1,10 @@
 const luhn = require('./index').default;
 
 
-test('should throw error is string is empty', () => {
+test('should throw error when string is empty', () => {
   const actual = () => luhn.generate('');
 
-  expect(actual).toThrow('string cannot be empty');
+  expect(actual).toThrow(expect.objectContaining({ message: 'string cannot be empty' }));
 });
 
 test.each([
@@ -22,4 +22,37 @@ test.each([
   const actual = luhn.generate(value);
 
   expect(actual).toBe(expected);
+});
+
+describe('validate', () => {
+  test.each([
+    { value: '', message: 'string cannot be empty', spec: 'string is empty' },
+    { value: '1', message: 'string must be longer than 1 character', spec: 'string has a length of 1' },
+    { value: '1a', message: 'string must be convertible to a number', spec: 'string cannot be converted to a number' },
+  ])('should throw error when $spec', ({ value, message }) => {
+    const actual = () => luhn.validate(value);
+
+    expect(actual).toThrow(expect.objectContaining({ message }));
+  });
+
+  test.each([
+    { value: '10', expected: false },
+    { value: '120', expected: false },
+    { value: '1231', expected: false },
+  ])('should return false if value contains an invalid check digit', ({ value, expected }) => {
+    const actual = luhn.validate(value);
+
+    expect(actual).toBe(expected);
+  });
+
+
+  test.each([
+    { value: '18', expected: true },
+    { value: '125', expected: true },
+    { value: '1230', expected: true },
+  ])('should return true if value contains a valid check digit', ({ value, expected}) => {
+    const actual = luhn.validate(value);
+
+    expect(actual).toBe(expected);
+  });
 });
