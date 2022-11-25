@@ -1,7 +1,11 @@
 {
   "name": "luhnjs",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "repository": "https://github.com/jrrembert/luhnjs.git",
   "license": "MIT",
   "private": false,
