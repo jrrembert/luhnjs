@@ -1,50 +1,35 @@
 const rules = {
-    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-var-requires": "off",
-    "no-constant-condition": "off",
-    "no-redeclare": "off",
-    "no-var": "off",
-    "prefer-const": "off",
-  };
+  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+  '@typescript-eslint/explicit-module-boundary-types': 'off',
+  '@typescript-eslint/no-explicit-any': 'off',
+  '@typescript-eslint/no-non-null-assertion': 'off',
+  '@typescript-eslint/no-var-requires': 'off',
+  'no-constant-condition': 'off',
+  'no-redeclare': 'off',
+  'no-var': 'off',
+  'prefer-const': 'off',
+  'quotes': ['error', 'single', { allowTemplateLiterals: true }],
+  'indent': ['error', 2],
+  'semi': ['error', 'always'],
+  'no-else-return': 'error',
+};
   
-  module.exports = {
-    root: true,
-    ignorePatterns: ["**/dist/**"],
-    plugins: ["@typescript-eslint"],
-    extends: [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-    ],
-    parser: "@typescript-eslint/parser",
-    parserOptions: {
-      ecmaVersion: 6,
-      sourceType: "module",
-    },
-    env: { es6: true },
-    rules,
-  
-    overrides: [
-      {
-        files: ["packages/*/types.ts"],
-        rules: {
-          // these are meant to test the typescript typings, unused variables are expected
-          "@typescript-eslint/no-unused-vars": "off",
-        },
-      },
-      {
-        files: [
-          ".eslintrc.js",
-          "packages/*/bench.js",
-          "packages/*/test.js",
-          "packages/turf/rollup.config.js",
-          "scripts/check-dependencies.js",
-        ],
-        env: {
-          node: true,
-        },
-      },
-    ],
-  };
+module.exports = {
+  root: true,
+  ignorePatterns: ['**/dist/**'],
+  plugins: ['@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 6,
+    sourceType: 'module',
+  },
+  env: { 
+    es6: true,
+    node: true,
+  },
+  rules,
+};
