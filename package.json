@@ -1,6 +1,6 @@
 {
   "name": "@jrrembert/luhnjs",
-  "version": "0.0.1-rc1",
+  "version": "0.0.1-rc2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
