@@ -95,3 +95,33 @@ describe('validate', () => {
     expect(actual).toBe(expected);
   });
 });
+
+describe('random', () => {
+  test.each([
+    { length: null as any, message: 'value must be a string - received null', spec: 'string cannot be null/undefined' },
+    { length: undefined as any, message: 'value must be a string - received undefined', spec: 'string cannot be null/undefined' },
+    { length: '', message: 'string cannot be empty', spec: 'string is empty' },
+    { length: '1a', message: 'string must be convertible to a number', spec: 'string cannot be converted to a number' },
+    { length: '1', message: 'string must be greater than 1', spec: 'string has a length of 1' },
+    { length: '1'.repeat(99), message: 'string must be less than 100 characters', spec: 'string is longer than 100 characters' },
+  ])('should throw error when $spec', ({ length, message }) => {
+    const actual = () => luhn.random(length);
+
+    expect(actual).toThrow(expect.objectContaining({ message }));
+  });
+
+  test.each([
+
+    { length: '2' },
+    { length: '25' },
+    { length: '50' },
+    { length: '100' },
+  ])('should return string of specified length ($length) with valid Luhn checksum appended to end', ({ length }) => {
+    const value = luhn.random(length);
+
+    const actual = luhn.validate(value);
+
+    expect(actual).toBe(true);
+    expect(value.length).toBe(parseInt(length));
+  });
+})

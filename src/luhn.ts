@@ -12,6 +12,10 @@ class GenerateOptions {
    * @param value potential value
    */
 function handleErrors(value: string): void {
+  if (typeof value !== 'string') {
+    throw new Error(`value must be a string - received ${value}`)
+  }
+
   if (!value.length) {
     throw new Error('string cannot be empty');
   }
@@ -37,7 +41,7 @@ function generateCheckSum(value: string): number {
   const sum = toArray.reduceRight((prev, current) => {
     if (double) {
       double = false;
-      const temp = parseInt(current) * 2;
+      const temp: number = parseInt(current) * 2;
 
       // if value is greater than or equal to 10, sum each digit of value ie. if value is 15, use 1 + 5 to get value
       if (temp >= 10) {
@@ -88,4 +92,35 @@ export function validate(value: string): boolean {
   const valueWithoutCheckSum = value.substring(0, value.length - 1);
 
   return value === generate(valueWithoutCheckSum);
+}
+
+/**
+ * 
+ * @param length 
+ * @returns 
+ */
+export function random(length: string): string {
+  handleErrors(length);
+
+  const lengthAsInteger = parseInt(length);
+
+  if (lengthAsInteger > 100) {
+    console.log('test')
+    throw new Error('string must be less than 100 characters');
+  }
+
+  if (lengthAsInteger < 2) {
+    throw new Error('string must be greater than 1');
+  }
+
+  const random = Array.from({ length: lengthAsInteger - 1 }, (_, index) => {
+    // Ensure the first digit is not zero
+    if (index === 0) {
+      return Math.floor(Math.random() * 9) + 1; // 1 to 9
+    }
+    
+    return Math.floor(Math.random() * 10);
+  }).join('')
+
+  return generate(random);
 }
