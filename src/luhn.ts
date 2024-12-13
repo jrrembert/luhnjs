@@ -7,9 +7,10 @@ class GenerateOptions {
 }
 
 /**
-   * Verify string is correct length and can be converted to a number
+   * Validates that input is a non-empty string that can be converted to a number
    *
-   * @param value potential value
+   * @param value - String to validate
+   * @throws {Error} If value is not a string, is empty, or cannot be converted to a number
    */
 function handleErrors(value: string): void {
   if (typeof value !== 'string') {
@@ -26,10 +27,11 @@ function handleErrors(value: string): void {
 }
 
 /**
-   * Generate a checksum using Luhn algorithm
-   *
-   * @param value value to check
-   */
+ * Generates a Luhn algorithm checksum digit for a string of numbers
+ *
+ * @param value - String of digits to generate checksum for
+ * @returns Single digit checksum value (0-9)
+ */
 function generateCheckSum(value: string): number {
   // convert to array
   const toArray = Array.from(value);
@@ -62,11 +64,11 @@ function generateCheckSum(value: string): number {
 }
 
 /**
-   * Return value with checksum calculated using Luhn algorithm
+   * Calculate and append Luhn algorithm checksum to a given value
    *
-   * @param value value to check
-   * @param options.checkSumOnly determine if value + checksum, or only checksum should be returned
-   * @returns
+   * @param value string of digits to generate checksum for
+   * @param options.checkSumOnly if true, returns only the checksum digit; if false, returns value with checksum appended
+   * @returns string containing either the checksum digit alone or the input value with checksum appended
    */
 export function generate(value: string, options?: GenerateOptions): string {
   handleErrors(value);
@@ -79,8 +81,8 @@ export function generate(value: string, options?: GenerateOptions): string {
 /**
    * Determine if the Luhn checksum for a given number is correct
    *
-   * @param value number containing a Luhn checksum
-   * @returns
+   * @param value string containing digits with a Luhn checksum as the last digit
+   * @returns boolean indicating whether the checksum is valid
    */
 export function validate(value: string): boolean {
   handleErrors(value);
@@ -95,9 +97,10 @@ export function validate(value: string): boolean {
 }
 
 /**
+ * Generate a random number with valid Luhn checksum
  * 
- * @param length 
- * @returns 
+ * @param length string containing the desired length of the generated number
+ * @returns string containing random digits with valid Luhn checksum
  */
 export function random(length: string): string {
   handleErrors(length);
