@@ -21,6 +21,18 @@ function handleErrors(value: string): void {
     throw new Error('string cannot be empty');
   }
 
+  if (value.includes(' ')) {
+    throw new Error('string cannot contain spaces');
+  }
+
+  if (value.includes('-')) {
+    throw new Error('negative numbers are not allowed');
+  }
+
+  if (value.includes('.')) {
+    throw new Error('floating point numbers are not allowed');
+  }
+
   if (isNaN(+value)) {
     throw new Error('string must be convertible to a number');
   }
@@ -108,7 +120,6 @@ export function random(length: string): string {
   const lengthAsInteger = parseInt(length);
 
   if (lengthAsInteger > 100) {
-    console.log('test')
     throw new Error('string must be less than 100 characters');
   }
 

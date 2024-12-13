@@ -2,7 +2,6 @@ import * as luhn from './luhn';
 
 describe('generate', () => {
   describe('when `options.checkSumOnly` is undefined/null', () => {
-
     test.each([
       { value: '', message: 'string cannot be empty', spec: 'string is empty' },
       { value: '1a', message: 'string must be convertible to a number', spec: 'string cannot be converted to a number' },
@@ -21,6 +20,7 @@ describe('generate', () => {
       expect(actual.length).toBeGreaterThan(1);
     });
   });
+
   describe('when `options.checkSumOnly` is set to false', () => {
     const options = { checkSumOnly: false };
 
@@ -62,6 +62,23 @@ describe('generate', () => {
       expect(actual).toBe(expected);
     });
   });
+
+  describe('edge cases', () => {
+    test.each([
+      { value: '0', expected: '00', spec: 'leading zero' },
+      { value: '00123', expected: '001230', spec: 'multiple leading zeros' },
+      { value: ' 123 ', message: 'string cannot contain spaces', spec: 'string with spaces' },
+      { value: '-123', message: 'negative numbers are not allowed', spec: 'negative number' },
+      { value: '123.45', message: 'floating point numbers are not allowed', spec: 'floating point' },
+    ])('should handle $spec correctly', ({ value, expected, message }) => {
+      if (message) {
+        expect(() => luhn.generate(value)).toThrow(expect.objectContaining({ message }));
+      } else {
+        const actual = luhn.generate(value);
+        expect(actual).toBe(expected);
+      }
+    });
+  });
 });
 
 describe('validate', () => {
@@ -94,6 +111,22 @@ describe('validate', () => {
 
     expect(actual).toBe(expected);
   });
+
+  describe('edge cases', () => {
+    test.each([
+      { value: '001230', expected: true, spec: 'leading zeros' },
+      { value: ' 1230 ', message: 'string cannot contain spaces', spec: 'string with spaces' },
+      { value: '-1230', message: 'negative numbers are not allowed', spec: 'negative number' },
+      { value: '123.40', message: 'floating point numbers are not allowed', spec: 'floating point' },
+    ])('should handle $spec correctly', ({ value, expected, message }) => {
+      if (message) {
+        expect(() => luhn.validate(value)).toThrow(expect.objectContaining({ message }));
+      } else {
+        const actual = luhn.validate(value);
+        expect(actual).toBe(expected);
+      }
+    });
+  });
 });
 
 describe('random', () => {
@@ -111,7 +144,6 @@ describe('random', () => {
   });
 
   test.each([
-
     { length: '2' },
     { length: '25' },
     { length: '50' },
@@ -123,5 +155,53 @@ describe('random', () => {
 
     expect(actual).toBe(true);
     expect(value.length).toBe(parseInt(length));
+  });
+
+  describe('randomness and formatting', () => {
+    test('should generate different numbers on subsequent calls', () => {
+      const length = '10';
+      const results = new Set();
+      
+      // Generate 100 numbers and check for duplicates
+      for (let i = 0; i < 100; i++) {
+        results.add(luhn.random(length));
+      }
+
+      expect(results.size).toBe(100); // All numbers should be unique
+    });
+
+    test('should only contain numeric characters', () => {
+      const length = '10';
+      const value = luhn.random(length);
+      
+      expect(value).toMatch(/^\d+$/);
+    });
+
+    test('generated number should pass Luhn validation', () => {
+      const length = '10';
+      const value = luhn.random(length);
+      
+      expect(luhn.validate(value)).toBe(true);
+    });
+
+    test('distribution should be roughly uniform', () => {
+      const length = '2'; // Test single digit distribution
+      const counts: Record<string, number> = {};
+      const iterations = 1000;
+      
+      // Generate many numbers and count digit frequencies
+      for (let i = 0; i < iterations; i++) {
+        const digit = luhn.random(length);
+        counts[digit] = counts[digit] ? counts[digit] + 1 : 1;
+      }
+      
+      // Check if each digit appears roughly the expected number of times (within 30% margin)
+      const expected = iterations / 10;
+      
+      Object.keys(counts).forEach((key: string) => {
+        expect(counts[key]).toBeGreaterThan(expected * 0.6);
+        expect(counts[key]).toBeLessThan(expected * 1.4);
+      });
+    });
   });
 })
