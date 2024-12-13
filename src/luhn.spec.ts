@@ -161,7 +161,7 @@ describe('random', () => {
     test('should generate different numbers on subsequent calls', () => {
       const length = '10';
       const results = new Set();
-      
+
       // Generate 100 numbers and check for duplicates
       for (let i = 0; i < 100; i++) {
         results.add(luhn.random(length));
@@ -173,14 +173,14 @@ describe('random', () => {
     test('should only contain numeric characters', () => {
       const length = '10';
       const value = luhn.random(length);
-      
+
       expect(value).toMatch(/^\d+$/);
     });
 
     test('generated number should pass Luhn validation', () => {
       const length = '10';
       const value = luhn.random(length);
-      
+
       expect(luhn.validate(value)).toBe(true);
     });
 
@@ -188,20 +188,20 @@ describe('random', () => {
       const length = '2'; // Test single digit distribution
       const counts: Record<string, number> = {};
       const iterations = 1000;
-      
+
       // Generate many numbers and count digit frequencies
       for (let i = 0; i < iterations; i++) {
         const digit = luhn.random(length);
         counts[digit] = counts[digit] ? counts[digit] + 1 : 1;
       }
-      
+
       // Check if each digit appears roughly the expected number of times (within 30% margin)
       const expected = iterations / 10;
-      
+
       Object.keys(counts).forEach((key: string) => {
         expect(counts[key]).toBeGreaterThan(expected * 0.6);
         expect(counts[key]).toBeLessThan(expected * 1.4);
       });
     });
   });
-})
+});

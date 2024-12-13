@@ -14,7 +14,7 @@ class GenerateOptions {
    */
 function handleErrors(value: string): void {
   if (typeof value !== 'string') {
-    throw new Error(`value must be a string - received ${value}`)
+    throw new Error(`value must be a string - received ${value}`);
   }
 
   if (!value.length) {
@@ -110,7 +110,7 @@ export function validate(value: string): boolean {
 
 /**
  * Generate a random number with valid Luhn checksum
- * 
+ *
  * @param length string containing the desired length of the generated number
  * @returns string containing random digits with valid Luhn checksum
  */
@@ -132,9 +132,9 @@ export function random(length: string): string {
     if (index === 0) {
       return Math.floor(Math.random() * 9) + 1; // 1 to 9
     }
-    
+
     return Math.floor(Math.random() * 10);
-  }).join('')
+  }).join('');
 
   return generate(random);
 }
