@@ -4,4 +4,4 @@
 
 [MIT](LICENSE)
 
-Copyright © 2009 J. Ryan Rembert
+Copyright © 2022-2025 J. Ryan Rembert
