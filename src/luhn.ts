@@ -1,3 +1,5 @@
+const CODE_POINTS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 class GenerateOptions {
   public checkSumOnly: boolean;
 
@@ -76,6 +78,36 @@ function generateCheckSum(value: string): number {
 }
 
 /**
+ * Generate a Luhn checksum for a given value mod n
+ *
+ * @param value - The value to generate a checksum for
+ * @param n - The modulus to use
+ * @returns The checksum for the value mod n
+ */
+function generateModNChecksum(value: string, n: number): number {
+  let factor = 2;
+  let sum = 0;
+
+  // Work from right to left
+  for (let i = value.length - 1; i >= 0; i--) {
+    // Convert character to code point (e.g., '3' -> 3, '2' -> 2)
+    const codePoint = parseInt(value[i], n);
+    let addend = factor * codePoint;
+
+    // Alternate factor between 2 and 1
+    factor = factor === 2 ? 1 : 2;
+
+    // Sum digits in base n
+    addend = Math.floor(addend / n) + (addend % n);
+    sum += addend;
+  }
+
+  // Calculate check digit
+  const remainder = sum % n;
+  return (n - remainder) % n;
+}
+
+/**
    * Calculate and append Luhn algorithm checksum to a given value
    *
    * @param value string of digits to generate checksum for
@@ -89,6 +121,57 @@ export function generate(value: string, options?: GenerateOptions): string {
 
   return options?.checkSumOnly ? checkSum : value.concat(checkSum);
 }
+
+export function generateModN(value: string, n: number, options?: GenerateOptions): string {
+  handleErrors(value);
+
+  if (n <= 0 || n > CODE_POINTS.length) {
+    throw new Error(`n must be between 1 and ${CODE_POINTS.length}`);
+  }
+
+  const checkSum = generateModNChecksum(value, n);
+  // Convert checksum to character using CODE_POINTS
+  const checkChar = CODE_POINTS[checkSum].toUpperCase();
+  
+  return options?.checkSumOnly ? checkChar : value + checkChar;
+}
+
+export function luhnModN(number: string, n: number) {
+  // Helper function to convert characters to their numeric values
+  function charToInt(char: string) {
+    if (char >= '0' && char <= '9') {
+      return parseInt(char);
+    } else if (char >= 'A' && char <= 'Z') {
+      return char.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+    } else if (char >= 'a' && char <= 'z') {
+      return char.charCodeAt(0) - 'a'.charCodeAt(0) + 10;
+    } else {
+      throw new Error("Invalid character: " + char);
+    }
+  }
+
+  // Convert the input string to an array of integers
+  const digits = number.split('').map(charToInt);
+
+  for (let i = digits.length - 1; i >= 0; i -= 2) {
+    digits[i] *= 2; 
+    if (digits[i] > 9) { 
+      digits[i] -= 9; // Subtract 9 only after doubling
+    }
+  }
+
+ 
+
+  // Calculate the sum of all digits
+  const digitSum = digits.reduce((sum: number, digit: number) => sum + digit, 0);
+
+  // Calculate the check digit
+  const checkDigit = (n - (digitSum % n)) % n;
+
+  return checkDigit;
+}
+
+
 
 /**
    * Determine if the Luhn checksum for a given number is correct
