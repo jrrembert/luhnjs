@@ -1,4 +1,4 @@
-const CODE_POINTS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const CODE_POINTS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 class GenerateOptions {
   public checkSumOnly: boolean;
@@ -104,6 +104,7 @@ function generateModNChecksum(value: string, n: number): number {
 
   // Calculate check digit
   const remainder = sum % n;
+
   return (n - remainder) % n;
 }
 
@@ -132,7 +133,7 @@ export function generateModN(value: string, n: number, options?: GenerateOptions
   const checkSum = generateModNChecksum(value, n);
   // Convert checksum to character using CODE_POINTS
   const checkChar = CODE_POINTS[checkSum].toUpperCase();
-  
+
   return options?.checkSumOnly ? checkChar : value + checkChar;
 }
 
@@ -141,26 +142,25 @@ export function luhnModN(value: string, n: number): number {
   function charToInt(char: string): number {
     if (char >= '0' && char <= '9') {
       return parseInt(char);
-    } else if (char >= 'A' && char <= 'Z') {
-      return char.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
-    } else if (char >= 'a' && char <= 'z') {
-      return char.charCodeAt(0) - 'a'.charCodeAt(0) + 10;
-    } else {
-      throw new Error("Invalid character: " + char);
     }
+    if (char >= 'A' && char <= 'Z') {
+      return char.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+    }
+    if (char >= 'a' && char <= 'z') {
+      return char.charCodeAt(0) - 'a'.charCodeAt(0) + 10;
+    }
+    throw new Error('Invalid character: ' + char);
   }
 
   // Convert the input string to an array of integers
   const digits = value.split('').map(charToInt);
 
   for (let i = digits.length - 1; i >= 0; i -= 2) {
-    digits[i] *= 2; 
-    if (digits[i] > 9) { 
+    digits[i] *= 2;
+    if (digits[i] > 9) {
       digits[i] -= 9; // Subtract 9 only after doubling
     }
   }
-
- 
 
   // Calculate the sum of all digits
   const digitSum = digits.reduce((sum: number, digit: number) => sum + digit, 0);
@@ -170,8 +170,6 @@ export function luhnModN(value: string, n: number): number {
 
   return checkDigit;
 }
-
-
 
 /**
    * Determine if the Luhn checksum for a given number is correct

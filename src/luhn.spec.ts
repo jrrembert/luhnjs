@@ -11,10 +11,10 @@ describe('generate', () => {
       expect(actual).toThrow(expect.objectContaining({ message }));
     });
     test.each([
-      { value: '1', expected: '18', options: undefined },
+      { value: '1', expected: '18' },
       { value: '7992739871', expected: '79927398713' },
-    ])('should return value + checksum ($expected) for value = $value', ({ value, expected, options }) => {
-      const actual = luhn.generate(value, options);
+    ])('should return value + checksum ($expected) for value = $value', ({ value, expected }) => {
+      const actual = luhn.generate(value);
 
       expect(actual).toBe(expected);
       expect(actual.length).toBeGreaterThan(1);
@@ -106,7 +106,7 @@ describe('validate', () => {
     { value: '18', expected: true },
     { value: '125', expected: true },
     { value: '1230', expected: true },
-  ])('should return true if value ($value) contains a valid checksum', ({ value, expected}) => {
+  ])('should return true if value ($value) contains a valid checksum', ({ value, expected }) => {
     const actual = luhn.validate(value);
 
     expect(actual).toBe(expected);
@@ -202,6 +202,69 @@ describe('random', () => {
         expect(counts[key]).toBeGreaterThan(expected * 0.6);
         expect(counts[key]).toBeLessThan(expected * 1.4);
       });
+    });
+  });
+});
+
+describe('generateModN', () => {
+  xdescribe('input validation', () => {
+    test.each([
+      { value: '', n: 16, message: 'string cannot be empty', spec: 'empty string' },
+      { value: '1a', n: 16, message: 'string must be convertible to a number', spec: 'non-numeric string' },
+      { value: '123', n: 0, message: 'n must be between 1 and 17', spec: 'n = 0' },
+      { value: '123', n: 18, message: 'n must be between 1 and 17', spec: 'n > CODE_POINTS.length' },
+      { value: ' 123', n: 16, message: 'string cannot contain spaces', spec: 'string with spaces' },
+      { value: '-123', n: 16, message: 'negative numbers are not allowed', spec: 'negative number' },
+      { value: '123.45', n: 16, message: 'floating point numbers are not allowed', spec: 'decimal number' },
+    ])('should throw error when $spec', ({ value, n, message }) => {
+      const actual = () => luhn.generateModN(value, n);
+      expect(actual).toThrow(expect.objectContaining({ message }));
+    });
+  });
+
+  xdescribe('when options.checkSumOnly is undefined/false', () => {
+    test.each([
+      { value: '0', n: 16, expected: '00' },
+      { value: '16', n: 16, expected: '16f' },
+      { value: '32', n: 16, expected: '32e' },
+    ])('should return value + checksum ($expected) for value = $value, n = $n', ({ value, n, expected }) => {
+      const actual = luhn.generateModN(value, n);
+      expect(actual).toBe(expected);
+    });
+  });
+
+  xdescribe('when options.checkSumOnly is true', () => {
+    const options = { checkSumOnly: true };
+
+    test.each([
+      { value: '0', n: 16, expected: '0' },
+      { value: '16', n: 16, expected: 'f' },
+      { value: '32', n: 16, expected: 'e' },
+    ])('should return checksum only ($expected) for value = $value, n = $n', ({ value, n, expected }) => {
+      const actual = luhn.generateModN(value, n, options);
+      expect(actual).toBe(expected);
+    });
+  });
+
+  describe('Luhn Mod N Check Digit Calculation', () => {
+    it('should calculate the correct check digit for numeric strings', () => {
+      expect(luhn.luhnModN('12345', 10)).toBe(5);
+    });
+
+    it('should calculate the correct check digit for alphanumeric strings', () => {
+      expect(luhn.luhnModN('A1B2C3', 10)).toBe(7);
+    });
+
+    it('should handle uppercase and lowercase letters', () => {
+      expect(luhn.luhnModN('a1b2c3', 10)).toBe(7);
+    });
+
+    it('should handle different moduli', () => {
+      expect(luhn.luhnModN('12345', 11)).toBe(1);
+    });
+
+    it('should throw an error for invalid characters', () => {
+      expect(() => luhn.luhnModN('123@45', 10)).toThrow('Invalid character: @');
     });
   });
 });
