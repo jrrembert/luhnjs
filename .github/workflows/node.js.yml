@@ -8,8 +8,10 @@ on:
     branches:
       - main
       - feature/*
+      - fix/*
+      - chore/*
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ main ]
 
 jobs:
   build:
