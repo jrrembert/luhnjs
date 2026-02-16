@@ -257,7 +257,7 @@ For `random`, the output is non-deterministic, so test the following properties:
 
 ## 6. Experimental API
 
-> **Status: Unstable.** These functions are not part of the stable public API. Ports may choose to implement or skip them. Signatures and behavior may change without notice.
+> **Status: Unstable.** These functions are not part of the stable public API and are **not exported from the main module entry point** (only `generate`, `validate`, and `random` are public exports). Ports may choose to implement or skip them. Signatures and behavior may change without notice.
 
 ### `generateModN(value, n, options?) -> string`
 
