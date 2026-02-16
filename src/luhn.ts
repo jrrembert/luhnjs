@@ -136,9 +136,9 @@ export function generateModN(value: string, n: number, options?: GenerateOptions
   return options?.checkSumOnly ? checkChar : value + checkChar;
 }
 
-export function luhnModN(number: string, n: number) {
+export function luhnModN(value: string, n: number): number {
   // Helper function to convert characters to their numeric values
-  function charToInt(char: string) {
+  function charToInt(char: string): number {
     if (char >= '0' && char <= '9') {
       return parseInt(char);
     } else if (char >= 'A' && char <= 'Z') {
@@ -151,7 +151,7 @@ export function luhnModN(number: string, n: number) {
   }
 
   // Convert the input string to an array of integers
-  const digits = number.split('').map(charToInt);
+  const digits = value.split('').map(charToInt);
 
   for (let i = digits.length - 1; i >= 0; i -= 2) {
     digits[i] *= 2; 
