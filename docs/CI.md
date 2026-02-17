@@ -145,7 +145,7 @@ See [RELEASE.md](RELEASE.md) for detailed documentation.
 - **Node version**: 22.x
 - **Steps**: lint → build → test → `npx semantic-release`
 - **Publishes to**: npm (https://registry.npmjs.org)
-- **Authentication**: `NPM_TOKEN` secret, automatic `GITHUB_TOKEN`
+- **Authentication**: `NPM_TOKEN` secret (npm), automatic `GITHUB_TOKEN` (GitHub Packages)
 - **Skips release** if no `feat:` or `fix:` commits since last release
 
 ### 4. Copyright Update

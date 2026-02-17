@@ -38,6 +38,9 @@ jobs:
       - name: Test
         run: yarn test
 
+      - name: Configure GitHub Packages auth
+        run: npm config set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -124,15 +124,16 @@ semantic-release is configured in `.releaserc.json` with these plugins:
 
 1. `@semantic-release/commit-analyzer` — determines version bump from commits
 2. `@semantic-release/release-notes-generator` — generates release notes
-3. `@semantic-release/npm` — publishes to npm
-4. `@semantic-release/github` — creates GitHub Release
+3. `@semantic-release/npm` — publishes to npm (registry.npmjs.org)
+4. `@semantic-release/exec` — publishes to GitHub Packages (npm.pkg.github.com)
+5. `@semantic-release/github` — creates GitHub Release
 
 ### Environment Requirements
 
 The release workflow requires these secrets:
 
 - `NPM_TOKEN` — npm publish authentication (configured in repository settings)
-- `GITHUB_TOKEN` — automatic, provided by GitHub Actions
+- `GITHUB_TOKEN` — automatic, provided by GitHub Actions (also used for GitHub Packages auth via `.npmrc`)
 
 ### Verification
 
@@ -145,7 +146,10 @@ npm view @jrrembert/luhnjs versions
 # Check latest version
 npm view @jrrembert/luhnjs version
 
-# Install and test
+# Check GitHub Packages
+gh api /orgs/jrrembert/packages/npm/luhnjs/versions
+
+# Install and test (npm)
 npm install @jrrembert/luhnjs@latest
 ```
 
@@ -244,11 +248,7 @@ This is no longer an issue with semantic-release — version management is fully
 
 Potential enhancements to the release process:
 
-1. **Multi-registry support**
-   - Document GitHub Packages installation for consumers
-   - Consider publishing to additional registries
-
-2. **Version 1.0.0 readiness**
+1. **Version 1.0.0 readiness**
    - Finalize API stability
    - Complete documentation
    - Full test coverage including experimental features
