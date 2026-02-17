@@ -88,10 +88,8 @@ gh pr create --base main --head rc --title "Release v1.0.0"
 When commits are merged to `main`, semantic-release:
 
 1. Analyzes commit messages to determine the version bump (major/minor/patch)
-2. Updates `package.json` version and `CHANGELOG.md`
-3. Publishes to npm
-4. Creates a GitHub Release with auto-generated release notes
-5. Commits the version bump and CHANGELOG back to the repository
+2. Publishes to npm
+3. Creates a GitHub Release with auto-generated release notes
 
 ### How It Works
 
@@ -126,10 +124,8 @@ semantic-release is configured in `.releaserc.json` with these plugins:
 
 1. `@semantic-release/commit-analyzer` — determines version bump from commits
 2. `@semantic-release/release-notes-generator` — generates release notes
-3. `@semantic-release/changelog` — writes CHANGELOG.md
-4. `@semantic-release/npm` — publishes to npm
-5. `@semantic-release/github` — creates GitHub Release
-6. `@semantic-release/git` — commits CHANGELOG.md and package.json back to repo
+3. `@semantic-release/npm` — publishes to npm
+4. `@semantic-release/github` — creates GitHub Release
 
 ### Environment Requirements
 
