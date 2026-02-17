@@ -69,6 +69,37 @@ Generate a random numeric string of the specified length with a valid Luhn check
 2. Pass the random digits to `generate` to append a valid check digit
 3. Return the full string
 
+### `generateModN(value, n, options?) -> string`
+
+Luhn mod-N variant that computes a check character from an expanded alphabet.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `value` | `string` | yes | Numeric string to compute a check character for |
+| `n` | `number` | yes | Modulus (1 to 36 inclusive, matching the `CODE_POINTS` alphabet `0-9A-Z`) |
+| `options.checkSumOnly` | `boolean` | no | Default `false`. When `true`, return only the check character |
+
+**Errors:** Same shared validation as `generate`, plus:
+
+| Condition | Error message |
+|---|---|
+| `n` <= 0 or `n` > 36 | `n must be between 1 and 36` |
+
+### `luhnModN(value, n) -> number`
+
+Lower-level mod-N check digit calculation. Accepts alphanumeric input (`0-9`, `A-Z`, `a-z`), returns the check digit as an integer.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `value` | `string` | yes | Alphanumeric string |
+| `n` | `number` | yes | Modulus for the check digit calculation |
+
+**Errors:**
+
+| Condition | Error message |
+|---|---|
+| Character not in `0-9`, `A-Z`, `a-z` | `Invalid character: <char>` |
+
 ## 3. Algorithm
 
 The Luhn algorithm computes a single check digit (0-9) for a given numeric string. All ports must implement this exact procedure.
@@ -255,42 +286,7 @@ For `random`, the output is non-deterministic, so test the following properties:
 | `random` | `"1"` | `string must be greater than 1` |
 | `random` | `"1"` repeated 99 times | `string must be less than 100 characters` |
 
-## 6. Experimental API
-
-> **Status: Unstable.** These functions are not part of the stable public API and are **not exported from the main module entry point** (only `generate`, `validate`, and `random` are public exports). Ports may choose to implement or skip them. Signatures and behavior may change without notice.
-
-### `generateModN(value, n, options?) -> string`
-
-Luhn mod-N variant that computes a check character from an expanded alphabet.
-
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `value` | `string` | yes | Numeric string to compute a check character for |
-| `n` | `number` | yes | Modulus (1 to 36 inclusive, matching the `CODE_POINTS` alphabet `0-9A-Z`) |
-| `options.checkSumOnly` | `boolean` | no | Default `false`. When `true`, return only the check character |
-
-**Errors:** Same shared validation as `generate`, plus:
-
-| Condition | Error message |
-|---|---|
-| `n` <= 0 or `n` > 36 | `n must be between 1 and 36` |
-
-### `luhnModN(value, n) -> number`
-
-Lower-level mod-N check digit calculation. Accepts alphanumeric input (`0-9`, `A-Z`, `a-z`), returns the check digit as an integer.
-
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `value` | `string` | yes | Alphanumeric string |
-| `n` | `number` | yes | Modulus for the check digit calculation |
-
-**Errors:**
-
-| Condition | Error message |
-|---|---|
-| Character not in `0-9`, `A-Z`, `a-z` | `Invalid character: <char>` |
-
-## 7. Constraints & Boundaries
+## 6. Constraints & Boundaries
 
 | Constraint | Value | Notes |
 |---|---|---|
