@@ -1,3 +1,5 @@
+const CODE_POINTS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 class GenerateOptions {
   public checkSumOnly: boolean;
 
@@ -137,4 +139,78 @@ export function random(length: string): string {
   }).join('');
 
   return generate(random);
+}
+
+/**
+ * Compute a Luhn mod-N checksum for a numeric string using CODE_POINTS mapping
+ */
+function generateModNChecksum(value: string, n: number): number {
+  const chars = Array.from(value);
+  let factor = 2;
+  let sum = 0;
+
+  for (let i = chars.length - 1; i >= 0; i--) {
+    let addend = CODE_POINTS.indexOf(chars[i].toUpperCase()) * factor;
+    addend = Math.floor(addend / n) + (addend % n);
+    sum += addend;
+    factor = factor === 2 ? 1 : 2;
+  }
+
+  return (n - (sum % n)) % n;
+}
+
+/**
+ * Calculate and append a Luhn mod-N checksum to a numeric string
+ *
+ * @param value - Numeric string to generate checksum for
+ * @param n - Modulus (base) between 1 and 36
+ * @param options.checkSumOnly - If true, returns only the checksum character
+ * @returns String containing either the checksum character alone or input with checksum appended
+ */
+export function generateModN(value: string, n: number, options?: GenerateOptions): string {
+  handleErrors(value);
+
+  if (n < 1 || n > 36) {
+    throw new Error('n must be between 1 and 36');
+  }
+
+  const checkSum = generateModNChecksum(value, n);
+  const checkChar = CODE_POINTS[checkSum];
+
+  return options?.checkSumOnly ? checkChar : value.concat(checkChar);
+}
+
+/**
+ * Convert a character to its code point index (0-9, A-Z, case-insensitive)
+ */
+function charToInt(char: string): number {
+  const index = CODE_POINTS.indexOf(char.toUpperCase());
+
+  if (index === -1) {
+    throw new Error(`Invalid character: ${char}`);
+  }
+
+  return index;
+}
+
+/**
+ * Calculate Luhn mod-N check digit for an alphanumeric string
+ *
+ * @param value - Alphanumeric string to calculate check digit for
+ * @param n - Modulus (base) to use for the algorithm
+ * @returns Check digit as a number
+ */
+export function luhnModN(value: string, n: number): number {
+  const chars = Array.from(value);
+  let factor = 2;
+  let sum = 0;
+
+  for (let i = chars.length - 1; i >= 0; i--) {
+    let addend = charToInt(chars[i]) * factor;
+    addend = Math.floor(addend / n) + (addend % n);
+    sum += addend;
+    factor = factor === 2 ? 1 : 2;
+  }
+
+  return (n - (sum % n)) % n;
 }
