@@ -5,11 +5,67 @@
 
 A TypeScript implementation of the Luhn algorithm for generating and validating checksums.
 
+Published as [`@jrrembert/luhnjs`](https://www.npmjs.com/package/@jrrembert/luhnjs) on npm.
+
+## Getting Started
+
+### Prerequisites
+
+Install [Node.js](https://nodejs.org/) (>=20.x) and [Yarn](https://yarnpkg.com/).
+
+### Installation
+
+```bash
+# npm
+$ npm install @jrrembert/luhnjs
+
+# yarn
+$ yarn add @jrrembert/luhnjs
+```
+
+### Usage
+
+```typescript
+import { generate, validate, random } from '@jrrembert/luhnjs';
+
+// Generate a checksum
+generate('7992739871');    // '79927398713'
+
+// Validate a checksum
+validate('79927398713');   // true
+
+// Generate a random number with valid checksum
+random('16');              // e.g. '4539148803436467'
+```
+
+## Commands
+
+```bash
+# Install dependencies
+$ yarn
+
+# Run tests
+$ yarn test
+
+# Lint
+$ yarn lint
+
+# Build
+$ yarn build
+```
+
 ## Documentation
 
-- [Continuous Integration](docs/CI.md) - CI/CD workflows and troubleshooting
-- [Release and Build Process](docs/RELEASE.md) - Guide for building and publishing releases
-- [Specification](docs/SPEC.md) - Cross-language port alignment and API specification
+<!-- TODO: Add link to API reference when published -->
+- [Specification](docs/SPEC.md) - API specification and cross-language port alignment
+- [Release Process](docs/RELEASE.md) - Automated releases via semantic-release
+- [CI/CD](docs/CI.md) - Workflows and troubleshooting
+- [Contributing](CONTRIBUTING.md) - How to contribute
+- [Security](SECURITY.md) - Reporting vulnerabilities
+
+## Contact
+
+Email: [J. Ryan Rembert](mailto:j.ryan.rembert@gmail.com)
 
 ## License
 
