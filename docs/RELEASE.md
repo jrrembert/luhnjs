@@ -50,123 +50,64 @@ Only the `/dist` directory is included in published packages. Source TypeScript 
 
 ### Overview
 
-Releases are managed through GitHub Releases and automated via GitHub Actions:
+Releases are fully automated via [semantic-release](https://github.com/semantic-release/semantic-release). When commits are pushed to `main`, semantic-release:
 
-1. Create and push a version tag
-2. Create a GitHub Release
-3. GitHub Actions automatically publishes to npm and GitHub Packages
+1. Analyzes commit messages to determine the version bump (major/minor/patch)
+2. Updates `package.json` version and `CHANGELOG.md`
+3. Publishes to npm
+4. Creates a GitHub Release with auto-generated release notes
+5. Commits the version bump and CHANGELOG back to the repository
 
-### Current Release Status
+No manual versioning, tagging, or publishing is needed.
 
-**Published versions on npm**:
-- `0.0.1-rc1` (Nov 25, 2022)
-- `0.0.1-rc2` (Nov 25, 2022)
-- `0.0.1-rc3` (Dec 13, 2024)
+### How It Works
 
-**Current version in package.json**: `0.0.1-rc3`
+#### Commit Message → Version Bump
 
-All releases are pre-releases (release candidates). No stable `1.0.0` has been published yet.
+semantic-release uses [conventional commits](https://www.conventionalcommits.org/) to determine the version bump:
 
-### Step-by-Step Release Guide
+| Commit prefix | Version bump | Example |
+|---|---|---|
+| `fix:` | Patch (1.0.0 → 1.0.1) | `fix: handle empty string input` |
+| `feat:` | Minor (1.0.0 → 1.1.0) | `feat: add batch validation` |
+| `feat!:` or `BREAKING CHANGE:` footer | Major (1.0.0 → 2.0.0) | `feat!: rename generate to compute` |
+| `chore:`, `docs:`, `refactor:`, `test:` | No release | `chore: update dependencies` |
 
-#### 1. Prepare the Release
+#### Release Workflow
 
-Ensure all changes are committed and merged to `main`:
+The GitHub Actions workflow (`.github/workflows/release.yml`) runs on every push to `main`:
 
-```bash
-git checkout main
-git pull origin main
-```
+1. **Checkout** with full git history (`fetch-depth: 0`)
+2. **Setup Node.js** 22.x with yarn cache
+3. **Install dependencies** (`yarn --frozen-lockfile`)
+4. **Lint** (`yarn lint`)
+5. **Build** (`yarn build`)
+6. **Test** (`yarn test`)
+7. **Release** (`npx semantic-release`)
 
-Run the full test suite:
+If no releasable commits are found (e.g., only `chore:` commits), semantic-release skips the release step.
 
-```bash
-yarn test
-yarn lint
-yarn build
-```
+#### Configuration
 
-#### 2. Update Version
+semantic-release is configured in `.releaserc.json` with these plugins:
 
-Update the version in `package.json`:
+1. `@semantic-release/commit-analyzer` — determines version bump from commits
+2. `@semantic-release/release-notes-generator` — generates release notes
+3. `@semantic-release/changelog` — writes CHANGELOG.md
+4. `@semantic-release/npm` — publishes to npm
+5. `@semantic-release/github` — creates GitHub Release
+6. `@semantic-release/git` — commits CHANGELOG.md and package.json back to repo
 
-```json
-{
-  "version": "0.0.1-rc4"  // or "1.0.0" for stable release
-}
-```
+### Environment Requirements
 
-Commit the version bump:
+The release workflow requires these secrets:
 
-```bash
-git add package.json
-git commit -m "chore: bump version to 0.0.1-rc4"
-git push origin main
-```
-
-#### 3. Create and Push Tag
-
-```bash
-# Create annotated tag
-git tag -a v0.0.1-rc4 -m "Release v0.0.1-rc4"
-
-# Push tag to GitHub
-git push origin v0.0.1-rc4
-```
-
-**Tag naming convention**: Use `v` prefix (e.g., `v0.0.1-rc4`, `v1.0.0`)
-
-#### 4. Create GitHub Release
-
-Using GitHub CLI:
-
-```bash
-gh release create v0.0.1-rc4 \
-  --title "v0.0.1-rc4" \
-  --notes "**Full Changelog**: https://github.com/jrrembert/luhnjs/compare/v0.0.1-rc3...v0.0.1-rc4" \
-  --prerelease  # Omit for stable releases
-```
-
-Or via GitHub web interface:
-1. Navigate to https://github.com/jrrembert/luhnjs/releases/new
-2. Select the tag you just created
-3. Set release title (e.g., `v0.0.1-rc4`)
-4. Add release notes
-5. Check "This is a pre-release" for RC versions
-6. Click "Publish release"
-
-#### 5. Automated Publishing
-
-Once the release is created, GitHub Actions automatically:
-
-1. **Build Job** (`build`)
-   - Checks out code
-   - Sets up Node.js 16.x
-   - Runs `yarn run build --if-present`
-
-2. **Publish to npm** (`publish-npm`)
-   - Runs after build succeeds
-   - Publishes to https://registry.npmjs.org
-   - Uses `NPM_TOKEN` secret for authentication
-   - Publishes as public scoped package (`@jrrembert/luhnjs`)
-
-3. **Publish to GitHub Packages** (`publish-gpr`)
-   - Runs after build succeeds
-   - Publishes to https://npm.pkg.github.com/
-   - Uses automatic `GITHUB_TOKEN` for authentication
-
-### Workflow Details
-
-The publish workflow (`.github/workflows/yarn-publish-github-package.yml`):
-
-- **Trigger**: `release.created` event
-- **Node version**: 16.x
-- **Publish command**: `yarn publish --access=public`
-- **Dual publish**: Both npm and GitHub Packages
+- `NPM_TOKEN` — npm publish authentication (configured in repository settings)
+- `GITHUB_TOKEN` — automatic, provided by GitHub Actions
 
 ### Verification
 
-After release, verify the publish succeeded:
+After a release, verify it succeeded:
 
 ```bash
 # Check npm
@@ -179,6 +120,16 @@ npm view @jrrembert/luhnjs version
 npm install @jrrembert/luhnjs@latest
 ```
 
+You can also check the [GitHub Releases page](https://github.com/jrrembert/luhnjs/releases) and the [Actions tab](https://github.com/jrrembert/luhnjs/actions/workflows/release.yml) for workflow run status.
+
+### Dry Run
+
+To test what semantic-release would do without actually publishing:
+
+```bash
+npx semantic-release --dry-run
+```
+
 ## Continuous Integration
 
 ### CI Workflow
@@ -188,7 +139,7 @@ The CI workflow (`.github/workflows/node.js.yml`) runs on:
 - Pull requests to `main`
 
 **Test matrix**:
-- Node.js versions: 14.x, 16.x, 18.x
+- Node.js versions: 18.x, 20.x, 22.x
 - Steps: install, lint, build, test
 
 ## Troubleshooting
@@ -209,13 +160,13 @@ yarn build
 - Verify all dependencies are listed in `package.json`
 - Check for circular dependencies
 
-### Publish Issues
+### Release Issues
 
-**Problem**: Workflow doesn't trigger after creating release
+**Problem**: Release workflow ran but no release was created
 
-- Verify the release was created (not just saved as draft)
-- Check GitHub Actions tab for workflow runs
-- Ensure the workflow file is on the `main` branch
+- Check commit messages — only `feat:` and `fix:` prefixes trigger releases
+- Commits with `chore:`, `docs:`, `refactor:`, `test:` prefixes do not trigger releases
+- Run `npx semantic-release --dry-run` locally to debug
 
 **Problem**: npm publish fails with authentication error
 
@@ -223,35 +174,15 @@ yarn build
 - Token must have publish permissions for `@jrrembert` scope
 - Generate new token at https://www.npmjs.com/settings/~/tokens
 
-**Problem**: GitHub Packages publish fails
+**Problem**: Release creates wrong version bump
 
-- Verify repository has `contents: read` and `packages: write` permissions
-- Check that `GITHUB_TOKEN` has necessary scopes
+- Review commit messages for correct conventional commit format
+- A `feat:` commit triggers minor bump, `fix:` triggers patch
+- Use `BREAKING CHANGE:` footer or `!` suffix for major bumps
 
 ### Version Mismatch
 
-**Problem**: Published version doesn't match git tag
-
-- Always update `package.json` version BEFORE creating the tag
-- The workflow publishes whatever version is in `package.json` on that commit
-- The tag name is just metadata for the release, not used for the package version
-
-## Release Checklist
-
-Before creating a release:
-
-- [ ] All tests passing locally (`yarn test`)
-- [ ] Linting passes (`yarn lint`)
-- [ ] Build succeeds (`yarn build`)
-- [ ] All changes merged to `main`
-- [ ] `package.json` version updated
-- [ ] Version bump committed and pushed
-- [ ] CHANGELOG updated (run `yarn changelog`)
-- [ ] Git tag created with `v` prefix
-- [ ] Tag pushed to GitHub
-- [ ] GitHub Release created (triggers publish workflow)
-- [ ] Verify publish succeeded on npm
-- [ ] Test installation: `npm install @jrrembert/luhnjs@<version>`
+This is no longer an issue with semantic-release — version management is fully automated. The version in `package.json`, the git tag, and the npm publish version are always in sync.
 
 ## Historical Notes
 
@@ -269,36 +200,26 @@ Before creating a release:
   - Updated GitHub Packages configuration
   - Same day as rc1, addressing publish issues
 
-- **v0.0.1-rc3**: Latest release (Dec 13, 2024)
+- **v0.0.1-rc3**: Latest pre-semantic-release version (Dec 13, 2024)
   - Added `random` function
   - Improved test coverage
   - Fixed linting issues
 
-### Workflow Evolution
+### Release Process Evolution
 
-The publish workflow was added and refined across rc0-rc2:
-- Commit `5bda004`: Initial npm publish workflow setup
-- Commit `832d525`: Added GitHub Packages publishing
-- Commit `f764bf1`: Version fixes
-- Commit `cfcf478`: Package name and scope configuration
+- **2022**: Manual release process with GitHub Actions publish workflow
+- **2025**: Added CHANGELOG generation via `conventional-changelog-cli`
+- **2026**: Adopted semantic-release for fully automated releases
 
 ## Future Improvements
 
 Potential enhancements to the release process:
 
-1. **Automate version bumping**
-   - Add `npm version` script to handle package.json updates
-   - Consider semantic-release for fully automated releases
-
-2. **Multi-registry support**
+1. **Multi-registry support**
    - Document GitHub Packages installation for consumers
    - Consider publishing to additional registries
 
-3. **Release notes automation**
-   - Auto-generate from conventional commits
-   - Include contributor attribution
-
-4. **Version 1.0.0 readiness**
+2. **Version 1.0.0 readiness**
    - Finalize API stability
    - Complete documentation
    - Full test coverage including experimental features

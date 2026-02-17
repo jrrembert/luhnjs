@@ -8,7 +8,7 @@ The project uses GitHub Actions for continuous integration with four automated w
 
 1. **Node.js CI** - Build, lint, and test on multiple Node versions
 2. **Dependency Review** - Security scanning for vulnerable dependencies
-3. **Publish** - Automated npm publishing on release
+3. **Release** - Automated versioning and npm publishing via semantic-release
 4. **Copyright Update** - Annual copyright year automation
 
 ## Workflows
@@ -131,22 +131,22 @@ If dependency review fails:
 - Use `yarn audit` locally before pushing
 - Pin dependencies to specific versions for predictability
 
-### 3. Publish
+### 3. Release
 
-**File**: `.github/workflows/yarn-publish-github-package.yml`
+**File**: `.github/workflows/release.yml`
 
-**Purpose**: Automatically publishes to npm and GitHub Packages when a release is created.
+**Purpose**: Automated versioning, changelog generation, and npm publishing via [semantic-release](https://github.com/semantic-release/semantic-release).
 
 See [RELEASE.md](RELEASE.md) for detailed documentation.
 
 #### Quick Reference
 
-- **Trigger**: GitHub Release created
-- **Publishes to**:
-  - npm (https://registry.npmjs.org)
-  - GitHub Packages (https://npm.pkg.github.com/)
-- **Node version**: 16.x
+- **Trigger**: Push to `main`
+- **Node version**: 22.x
+- **Steps**: lint → build → test → `npx semantic-release`
+- **Publishes to**: npm (https://registry.npmjs.org)
 - **Authentication**: `NPM_TOKEN` secret, automatic `GITHUB_TOKEN`
+- **Skips release** if no `feat:` or `fix:` commits since last release
 
 ### 4. Copyright Update
 
@@ -160,9 +160,9 @@ See [RELEASE.md](RELEASE.md) for detailed documentation.
 
 #### How It Works
 
-1. Runs `update-copyright-date.sh README.md`
-2. Updates copyright line: `Copyright © 2022-YYYY` → `Copyright © 2022-2027`
-3. Commits and pushes changes directly to `main`
+1. Runs `update-copyright-date.sh README.md LICENSE`
+2. Updates copyright lines in both files to the current year
+3. Creates a pull request via `peter-evans/create-pull-request@v7`
 
 #### Script Details
 
@@ -172,38 +172,13 @@ See [RELEASE.md](RELEASE.md) for detailed documentation.
 - Updates end year to current year
 - Pattern: `© YYYY-YYYY` or `© YYYY`
 
-#### Known Issues
-
-**January 1, 2026 Failure**:
-- The workflow run failed at "Push to repository" step
-- Exit code 1 suggests permission issue or no changes to commit
-- Possible causes:
-  - Copyright already updated manually
-  - Insufficient permissions for automated commits
-  - Protected branch rules blocking bot commits
-
 #### Manual Copyright Update
 
-If automated update fails:
+If the automated update fails or needs to be run manually:
 
 ```bash
-# Run the script locally
-./update-copyright-date.sh README.md
-
-# Verify changes
-git diff README.md
-
-# Commit and push
-git add README.md
-git commit -m "chore: update copyright year"
-git push origin main
+./update-copyright-date.sh README.md LICENSE
 ```
-
-#### Configuration
-
-The workflow uses bot credentials:
-- **Name**: "Ryan Rembert"
-- **Email**: "jrrembert@users.noreply.github.com"
 
 ## CI Status Badges
 
@@ -433,15 +408,14 @@ Workflows use GitHub Actions cache:
 Workflows follow least-privilege principle:
 - **Node.js CI**: No special permissions needed
 - **Dependency Review**: `contents: read` only
-- **Publish**: `contents: read`, `packages: write`
-- **Copyright Update**: Requires push access to `main`
+- **Release**: `contents: write`, `issues: write`, `pull-requests: write`, `packages: write`
+- **Copyright Update**: `contents: write`, `pull-requests: write`
 
 ### Protected Branches
 
-If `main` is protected:
-- Direct commits from workflows may fail
-- Copyright update workflow needs exemption or should create PR instead
-- Consider using bot account with write permissions
+Both the copyright update and release workflows are designed to work with branch protection:
+- Copyright update creates a PR instead of pushing directly
+- semantic-release creates tags and GitHub Releases (does not push to protected branches directly)
 
 ### Secrets Safety
 
@@ -493,27 +467,16 @@ When adding new Node.js LTS versions:
 As of February 2026:
 - **Node.js CI**: 100% success rate on recent runs
 - **Dependency Review**: All PRs passing
-- **Publish**: No recent releases (last: v0.0.1-rc3, Dec 2024)
-- **Copyright Update**: Failed Jan 1, 2026 (needs investigation)
+- **Release**: Adopted semantic-release (Feb 2026), replaces manual publish workflow
+- **Copyright Update**: Fixed in Feb 2026 to create PR instead of direct push
 
 ## Future Improvements
 
 ### Planned Enhancements
 
-1. **Performance benchmarking**
-   - Add benchmark job for algorithm performance
-   - Track performance over time
-   - Alert on regressions
-
-2. **Release automation**
-   - Add `release-please` for automatic versioning
-   - Generate changelogs from commits
-   - Create releases automatically
-
-3. **Notification improvements**
-   - Slack/Discord notifications for failures
-   - Only notify on main branch failures
-   - Weekly summary reports
+1. **Multi-registry publishing**
+   - Add GitHub Packages publishing to semantic-release pipeline
+   - Document GitHub Packages installation for consumers
 
 ## Resources
 

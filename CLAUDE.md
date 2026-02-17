@@ -15,8 +15,11 @@ yarn test         # Run all tests
 yarn test src/luhn.spec.ts                # Run a single test file
 yarn test --testNamePattern="generate"    # Run tests matching a pattern
 yarn lint         # Lint with ESLint
-yarn changelog    # Generate/update CHANGELOG.md from conventional commits
 ```
+
+## Releases
+
+Releases are fully automated via [semantic-release](https://github.com/semantic-release/semantic-release). When commits are merged to `main`, semantic-release analyzes commit messages and automatically determines the version bump, updates `CHANGELOG.md`, publishes to npm, and creates a GitHub Release. No manual versioning or publishing is needed. See `docs/RELEASE.md` for details.
 
 ## Architecture
 
