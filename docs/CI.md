@@ -4,12 +4,13 @@ This document describes the CI/CD workflows configured for `@jrrembert/luhnjs`.
 
 ## Overview
 
-The project uses GitHub Actions for continuous integration with four automated workflows:
+The project uses GitHub Actions for continuous integration with five automated workflows:
 
 1. **Node.js CI** - Build, lint, and test on multiple Node versions
 2. **Dependency Review** - Security scanning for vulnerable dependencies
 3. **Release** - Automated versioning and npm publishing via semantic-release
-4. **Copyright Update** - Annual copyright year automation
+4. **Sync package.json version** - Updates `package.json` version after each release
+5. **Copyright Update** - Annual copyright year automation
 
 ## Workflows
 
@@ -147,7 +148,28 @@ See [RELEASE.md](RELEASE.md) for detailed documentation.
 - **Authentication**: `NPM_TOKEN` secret, automatic `GITHUB_TOKEN`
 - **Skips release** if no `feat:` or `fix:` commits since last release
 
-### 4. Copyright Update
+### 4. Sync package.json version
+
+**File**: `.github/workflows/sync-version.yml`
+
+**Purpose**: Automatically creates a PR to update `package.json` version after each semantic-release publish.
+
+#### Triggers
+
+- **Release** `published` event (fires after semantic-release creates a GitHub Release)
+
+#### How It Works
+
+1. Extracts version from the release tag (strips `v` prefix)
+2. Updates `package.json` via `npm version --no-git-tag-version`
+3. Creates a PR via `peter-evans/create-pull-request@v7`
+4. Targets the branch the release was published from (`main` or `rc`)
+
+#### Why This Exists
+
+The `@semantic-release/git` plugin was removed because it can't push directly to protected branches. This workflow achieves the same result by creating a PR instead.
+
+### 5. Copyright Update
 
 **File**: `.github/workflows/update-copyright-date.yml`
 
@@ -408,6 +430,7 @@ Workflows follow least-privilege principle:
 - **Node.js CI**: No special permissions needed
 - **Dependency Review**: `contents: read` only
 - **Release**: `contents: write`, `issues: write`, `pull-requests: write`, `packages: write`
+- **Sync package.json version**: `contents: write`, `pull-requests: write`
 - **Copyright Update**: `contents: write`, `pull-requests: write`
 
 ### Protected Branches
