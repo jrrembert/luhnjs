@@ -33,7 +33,6 @@ The project uses GitHub Actions for continuous integration with four automated w
 
 Tests across multiple Node.js versions for compatibility:
 
-- Node.js 18.x
 - Node.js 20.x
 - Node.js 22.x
 
@@ -57,7 +56,7 @@ Tests across multiple Node.js versions for compatibility:
 
 #### Success Criteria
 
-All three Node.js versions must:
+All Node.js versions must:
 - Install dependencies without errors
 - Pass linting checks
 - Build successfully
@@ -385,7 +384,7 @@ Typical CI run times (per Node version):
 - Build: ~5-8s
 - Test: ~3-5s
 
-**Total**: ~1 minute per Node version (~3 minutes for full matrix)
+**Total**: ~1 minute per Node version (~2 minutes for full matrix)
 
 ### Caching
 
@@ -414,7 +413,7 @@ Workflows follow least-privilege principle:
 ### Protected Branches
 
 Both `main` and `rc` have branch protection with required status checks:
-- `build (18.x)`, `build (20.x)`, `build (22.x)`, `dependency-review`
+- `build (20.x)`, `build (22.x)`, `dependency-review`
 
 Workflows are designed to work with branch protection:
 - Copyright update creates a PR instead of pushing directly
@@ -451,7 +450,7 @@ grep -r "uses: actions" .github/workflows/
 When adding new Node.js LTS versions:
 
 1. Edit `.github/workflows/node.js.yml`
-2. Add version to matrix: `node-version: [18.x, 20.x, 22.x]`
+2. Add version to matrix: `node-version: [20.x, 22.x]`
 3. Test locally with new version
 4. Consider removing EOL versions
 
