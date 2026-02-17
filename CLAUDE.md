@@ -42,6 +42,7 @@ Releases are fully automated via [semantic-release](https://github.com/semantic-
 - Branch naming: use prefixes `feature/`, `fix/`, `chore/` (e.g., `feature/add-auth`, `fix/login-bug`)
 - Commits, PR titles, and issue titles follow conventional commit format: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`
 - Always merge PRs via GitHub UI or `gh pr merge` — never merge locally with `git merge` then push. Local merges break GitHub's `Closes #N` auto-close linking.
+- PRs use the template at `.github/PULL_REQUEST_TEMPLATE.md` — fill in all sections (Summary, Changes, Test plan)
 - Use `/pr` or `/pr <issue-number>` to create pull requests with the standard format
 - Always create the feature branch from `rc` **before** writing code, not at commit time
 
