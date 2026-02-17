@@ -213,32 +213,6 @@ yarn build
 
 This is no longer an issue with semantic-release — version management is fully automated. The version in `package.json`, the git tag, and the npm publish version are always in sync.
 
-## Historical Notes
-
-### Previous Releases
-
-- **v0.0.1-rc0**: Initial release attempt (Nov 25, 2022)
-  - Tag created but may not have published successfully
-  - Not found in npm registry
-
-- **v0.0.1-rc1**: First successful npm publish (Nov 25, 2022)
-  - Set up initial publish workflow
-  - Configured scoped package name
-
-- **v0.0.1-rc2**: Package configuration fixes (Nov 25, 2022)
-  - Updated GitHub Packages configuration
-  - Same day as rc1, addressing publish issues
-
-- **v0.0.1-rc3**: Latest pre-semantic-release version (Dec 13, 2024)
-  - Added `random` function
-  - Improved test coverage
-  - Fixed linting issues
-
-### Release Process Evolution
-
-- **2022**: Manual release process with GitHub Actions publish workflow
-- **2025**: Added CHANGELOG generation via `conventional-changelog-cli` (later removed; release notes now live in GitHub Releases)
-- **2026**: Adopted semantic-release for fully automated releases
 
 ## Future Improvements
 
