@@ -15,8 +15,15 @@ yarn test         # Run all tests
 yarn test src/luhn.spec.ts                # Run a single test file
 yarn test --testNamePattern="generate"    # Run tests matching a pattern
 yarn lint         # Lint with ESLint
-yarn changelog    # Generate/update CHANGELOG.md from conventional commits
 ```
+
+## Releases
+
+Releases are fully automated via [semantic-release](https://github.com/semantic-release/semantic-release). No manual versioning or publishing is needed. See `docs/RELEASE.md` for details.
+
+- **Release candidates**: Push `feat:`/`fix:` commits to the `rc` branch → publishes pre-release versions (e.g., `1.0.0-rc.1`)
+- **Stable releases**: Merge `rc` into `main` → publishes stable versions (e.g., `1.0.0`)
+- Every stable release must be preceded by at least one release candidate
 
 ## Architecture
 
@@ -26,17 +33,17 @@ yarn changelog    # Generate/update CHANGELOG.md from conventional commits
 
 ## Git Workflow
 
-- Primary branch is `main`
-- Never push directly to `main`
+- **Default PR target is `rc`** — all `feat:` and `fix:` branches target `rc`, not `main`
+- `chore:`, `docs:`, `refactor:`, `test:` branches may target `main` directly (they don't trigger releases)
+- To publish a stable release, merge `rc` → `main` via PR
+- Never push directly to `main` or `rc`
 - Every change must have a GitHub issue. If the user provides an issue number, use it. Otherwise, create one before starting work
 - Every PR must include `Closes #N` in the body to auto-close its issue on merge
 - Branch naming: use prefixes `feature/`, `fix/`, `chore/` (e.g., `feature/add-auth`, `fix/login-bug`)
 - Commits, PR titles, and issue titles follow conventional commit format: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`
-- PRs require at least one review before merging to `main`
 - Always merge PRs via GitHub UI or `gh pr merge` — never merge locally with `git merge` then push. Local merges break GitHub's `Closes #N` auto-close linking.
-- PRs always target `main` unless the user explicitly specifies a different base branch
 - Use `/pr` or `/pr <issue-number>` to create pull requests with the standard format
-- Always create the feature branch from `main` **before** writing code, not at commit time
+- Always create the feature branch from `rc` **before** writing code, not at commit time
 
 This project follows Test-Driven Development (TDD). For every feature or bug fix:
 
