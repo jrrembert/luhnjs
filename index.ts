@@ -1,1 +1,1 @@
-export { generate, validate, random } from './src/luhn';
+export { generate, validate, random, generateModN, luhnModN } from './src/luhn';
