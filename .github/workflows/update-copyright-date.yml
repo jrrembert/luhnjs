@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Check out repository code
         # https://github.com/actions/checkout/tree/v3.0.2
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
       - name: Modify date and time
         run: |
           ./update-copyright-date.sh README.md
