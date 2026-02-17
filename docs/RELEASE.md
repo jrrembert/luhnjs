@@ -237,7 +237,7 @@ This is no longer an issue with semantic-release — version management is fully
 ### Release Process Evolution
 
 - **2022**: Manual release process with GitHub Actions publish workflow
-- **2025**: Added CHANGELOG generation via `conventional-changelog-cli`
+- **2025**: Added CHANGELOG generation via `conventional-changelog-cli` (later removed; release notes now live in GitHub Releases)
 - **2026**: Adopted semantic-release for fully automated releases
 
 ## Future Improvements
