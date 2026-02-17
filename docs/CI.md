@@ -520,25 +520,6 @@ When adding new Node.js LTS versions:
 3. Test locally with new version
 4. Consider removing EOL versions
 
-## CI History
-
-### Workflow Evolution
-
-- **Initial setup** (2022): Basic Node.js CI with build and test
-- **Dependency review** (2022): Added security scanning
-- **Publish automation** (2022): Automated npm publishing
-- **Copyright automation** (2022): Annual copyright updates
-- **Matrix expansion** (2025): Updated branch triggers to include all prefixes
-- **PR title validation** (2026): Added conventional commit enforcement on PR titles
-
-### Recent Runs
-
-As of February 2026:
-- **Node.js CI**: 100% success rate on recent runs
-- **Dependency Review**: All PRs passing
-- **Release**: Adopted semantic-release (Feb 2026), replaces manual publish workflow
-- **Copyright Update**: Fixed in Feb 2026 to create PR instead of direct push
-
 ## Future Improvements
 
 ### Planned Enhancements
