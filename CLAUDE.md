@@ -37,6 +37,7 @@ Releases are fully automated via [semantic-release](https://github.com/semantic-
 - `chore:`, `docs:`, `refactor:`, `test:` branches may target `main` directly (they don't trigger releases)
 - To publish a stable release, merge `rc` → `main` via PR
 - Never push directly to `main` or `rc`
+- Never force push to protected branches (`main`, `rc`) without explicit approval from the repo admin
 - Every change must have a GitHub issue. If the user provides an issue number, use it. Otherwise, create one before starting work
 - Every PR must include `Closes #N` in the body to auto-close its issue on merge
 - Branch naming: use prefixes `feature/`, `fix/`, `chore/` (e.g., `feature/add-auth`, `fix/login-bug`)
