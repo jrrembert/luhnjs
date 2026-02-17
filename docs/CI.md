@@ -419,7 +419,6 @@ Both `main` and `rc` have branch protection with required status checks:
 Workflows are designed to work with branch protection:
 - Copyright update creates a PR instead of pushing directly
 - semantic-release creates tags and GitHub Releases (does not push to protected branches directly)
-- **Note**: If required PR reviews are ever added, the `@semantic-release/git` plugin (which commits CHANGELOG/version back) will need a PAT instead of `GITHUB_TOKEN`
 
 ### Secrets Safety
 
