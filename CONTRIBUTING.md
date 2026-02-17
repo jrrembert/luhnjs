@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to luhnjs!
+Thanks for your interest in contributing to luhnjs! Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
 ## Getting Started
 
