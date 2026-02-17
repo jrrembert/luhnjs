@@ -1,5 +1,5 @@
 import * as luhn from './luhn';
-import { generateModN, luhnModN } from './luhn';
+import { generateModN, checksumModN, validateModN } from './luhn';
 
 describe('generate', () => {
   describe('when `options.checkSumOnly` is undefined/null', () => {
@@ -282,7 +282,7 @@ describe('generateModN', () => {
   });
 });
 
-describe('luhnModN', () => {
+describe('checksumModN', () => {
   describe('check digit calculation', () => {
     test.each([
       { value: '12345', n: 10, expected: 5, spec: 'numeric strings' },
@@ -291,7 +291,7 @@ describe('luhnModN', () => {
       { value: '12345', n: 11, expected: 9, spec: 'different moduli' },
       { value: '5', n: 10, expected: 9, spec: 'single character' },
     ])('should return $expected for ($value, $n) - $spec', ({ value, n, expected }) => {
-      const actual = luhnModN(value, n);
+      const actual = checksumModN(value, n);
 
       expect(actual).toBe(expected);
     });
@@ -299,10 +299,84 @@ describe('luhnModN', () => {
 
   describe('error handling', () => {
     test.each([
+      { value: null as any, n: 10, message: 'value must be a string - received null', spec: 'null input' },
+      { value: undefined as any, n: 10, message: 'value must be a string - received undefined', spec: 'undefined input' },
+    ])('should throw error for $spec', ({ value, n, message }) => {
+      expect(() => checksumModN(value, n)).toThrow(expect.objectContaining({ message }));
+    });
+
+    test('should throw error for empty string', () => {
+      expect(() => checksumModN('', 10)).toThrow(expect.objectContaining({ message: 'string cannot be empty' }));
+    });
+
+    test.each([
+      { value: '123', n: 0, message: 'n must be between 1 and 36', spec: 'n = 0' },
+      { value: '123', n: 37, message: 'n must be between 1 and 36', spec: 'n = 37' },
+    ])('should throw error for $spec', ({ value, n, message }) => {
+      expect(() => checksumModN(value, n)).toThrow(expect.objectContaining({ message }));
+    });
+
+    test.each([
       { value: '123@45', n: 10, char: '@', spec: 'invalid character' },
       { value: 'hello!', n: 10, char: '!', spec: 'special character' },
     ])('should throw error for $spec', ({ value, n, char }) => {
-      expect(() => luhnModN(value, n)).toThrow(`Invalid character: ${char}`);
+      expect(() => checksumModN(value, n)).toThrow(`Invalid character: ${char}`);
+    });
+  });
+});
+
+describe('validateModN', () => {
+  describe('input validation', () => {
+    test.each([
+      { value: null as any, n: 10, message: 'value must be a string - received null', spec: 'null input' },
+      { value: undefined as any, n: 10, message: 'value must be a string - received undefined', spec: 'undefined input' },
+      { value: '', n: 10, message: 'string cannot be empty', spec: 'empty string' },
+      { value: '1', n: 10, message: 'string must be longer than 1 character', spec: 'length 1' },
+    ])('should throw error for $spec', ({ value, n, message }) => {
+      expect(() => validateModN(value, n)).toThrow(expect.objectContaining({ message }));
+    });
+
+    test.each([
+      { value: '18', n: 0, message: 'n must be between 1 and 36', spec: 'n = 0' },
+      { value: '18', n: 37, message: 'n must be between 1 and 36', spec: 'n = 37' },
+    ])('should throw error for $spec', ({ value, n, message }) => {
+      expect(() => validateModN(value, n)).toThrow(expect.objectContaining({ message }));
+    });
+  });
+
+  describe('valid checksums', () => {
+    test.each([
+      { value: '1230', n: 10, spec: 'n=10 basic' },
+      { value: '79927398713', n: 10, spec: 'n=10 long' },
+      { value: '1E', n: 16, spec: 'n=16 with alphanumeric check char' },
+      { value: '163', n: 16, spec: 'n=16 multi-digit' },
+    ])('should return true for valid checksum ($spec)', ({ value, n }) => {
+      expect(validateModN(value, n)).toBe(true);
+    });
+
+    test('values produced by generateModN should validate', () => {
+      const generated = generateModN('123', 10);
+
+      expect(validateModN(generated, 10)).toBe(true);
+    });
+  });
+
+  describe('invalid checksums', () => {
+    test.each([
+      { value: '1231', n: 10, spec: 'tampered n=10' },
+      { value: '1F', n: 16, spec: 'tampered n=16' },
+    ])('should return false for invalid checksum ($spec)', ({ value, n }) => {
+      expect(validateModN(value, n)).toBe(false);
+    });
+  });
+
+  describe('edge cases', () => {
+    test('n=10 matches validate behavior', () => {
+      const values = ['18', '125', '1230', '79927398713'];
+
+      values.forEach((value) => {
+        expect(validateModN(value, 10)).toBe(luhn.validate(value));
+      });
     });
   });
 });
