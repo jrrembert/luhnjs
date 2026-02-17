@@ -290,19 +290,15 @@ Potential enhancements to the release process:
    - Add `npm version` script to handle package.json updates
    - Consider semantic-release for fully automated releases
 
-2. **Prepublish validation**
-   - Add `prepublishOnly` script to run tests before publish
-   - Prevent publishing broken builds
-
-3. **Multi-registry support**
+2. **Multi-registry support**
    - Document GitHub Packages installation for consumers
    - Consider publishing to additional registries
 
-4. **Release notes automation**
+3. **Release notes automation**
    - Auto-generate from conventional commits
    - Include contributor attribution
 
-5. **Version 1.0.0 readiness**
+4. **Version 1.0.0 readiness**
    - Finalize API stability
    - Complete documentation
    - Full test coverage including experimental features

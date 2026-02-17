@@ -13,7 +13,8 @@
     "build": "tsc && node dist/index.js",
     "lint": "eslint .",
     "test": "jest",
-    "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s"
+    "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s",
+    "prepublishOnly": "yarn lint && yarn test && yarn build"
   },
   "devDependencies": {
     "@types/jest": "^29.2.3",
