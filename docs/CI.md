@@ -4,12 +4,13 @@ This document describes the CI/CD workflows configured for `@jrrembert/luhnjs`.
 
 ## Overview
 
-The project uses GitHub Actions for continuous integration with four automated workflows:
+The project uses GitHub Actions for continuous integration with five automated workflows:
 
 1. **Node.js CI** - Build, lint, and test on multiple Node versions
 2. **Dependency Review** - Security scanning for vulnerable dependencies
 3. **Release** - Automated versioning and npm publishing via semantic-release
 4. **Copyright Update** - Annual copyright year automation
+5. **PR Title Validation** - Enforces conventional commit format on PR titles
 
 ## Workflows
 
@@ -178,6 +179,47 @@ If the automated update fails or needs to be run manually:
 ```bash
 ./update-copyright-date.sh README.md LICENSE
 ```
+
+### 5. PR Title Validation
+
+**File**: `.github/workflows/pr-title.yml`
+
+**Purpose**: Ensures all PR titles follow the [conventional commits](https://www.conventionalcommits.org/) format. Since PRs are squash-merged, the PR title becomes the final commit message that `semantic-release` uses to determine version bumps.
+
+#### Triggers
+
+- **Pull request target** events: `opened`, `edited`, `synchronize`
+- Runs on all PRs regardless of target branch
+
+#### How It Works
+
+Uses [amannn/action-semantic-pull-request](https://github.com/amannn/action-semantic-pull-request) to parse the PR title and enforce the format:
+
+```
+<type>: <description>
+```
+
+Valid types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`
+
+#### Examples
+
+| PR Title | Result |
+|---|---|
+| `feat: add checksumModN function` | ✅ Pass |
+| `fix: correct off-by-one in generate` | ✅ Pass |
+| `chore: update dependencies` | ✅ Pass |
+| `add new feature` | ❌ Fail |
+| `WIP: something` | ❌ Fail |
+
+#### Permissions
+
+- `pull-requests: read` - Read PR metadata to validate title
+
+#### Required Status Check
+
+This workflow is a required status check (`Validate PR title`) on both `main` and `rc`. PRs cannot be merged until the title passes validation.
+
+---
 
 ## CI Status Badges
 
@@ -409,11 +451,12 @@ Workflows follow least-privilege principle:
 - **Dependency Review**: `contents: read` only
 - **Release**: `contents: write`, `issues: write`, `pull-requests: write`, `packages: write`
 - **Copyright Update**: `contents: write`, `pull-requests: write`
+- **PR Title Validation**: `pull-requests: read`
 
 ### Protected Branches
 
 Both `main` and `rc` have branch protection with required status checks:
-- `build (20.x)`, `build (22.x)`, `dependency-review`
+- `build (20.x)`, `build (22.x)`, `dependency-review`, `Validate PR title`
 
 Workflows are designed to work with branch protection:
 - Copyright update creates a PR instead of pushing directly
@@ -463,6 +506,7 @@ When adding new Node.js LTS versions:
 - **Publish automation** (2022): Automated npm publishing
 - **Copyright automation** (2022): Annual copyright updates
 - **Matrix expansion** (2025): Updated branch triggers to include all prefixes
+- **PR title validation** (2026): Added conventional commit enforcement on PR titles
 
 ### Recent Runs
 
