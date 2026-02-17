@@ -70,7 +70,7 @@ $ yarn build
 ## Documentation
 
 <!-- TODO: Add link to API reference when published -->
-- [Specification](docs/SPEC.md) - API specification and cross-language port alignment
+- [Specification](docs/SPEC.md) - API specification
 - [Release Process](docs/RELEASE.md) - Automated releases via semantic-release
 - [CI/CD](docs/CI.md) - Workflows and troubleshooting
 - [Contributing](CONTRIBUTING.md) - How to contribute
