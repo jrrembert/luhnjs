@@ -1,4 +1,5 @@
 import * as luhn from './luhn';
+import { generateModN, luhnModN } from './luhn';
 
 describe('generate', () => {
   describe('when `options.checkSumOnly` is undefined/null', () => {
@@ -202,6 +203,106 @@ describe('random', () => {
         expect(counts[key]).toBeGreaterThan(expected * 0.6);
         expect(counts[key]).toBeLessThan(expected * 1.4);
       });
+    });
+  });
+});
+
+describe('generateModN', () => {
+  describe('input validation', () => {
+    test.each([
+      { value: '', n: 10, message: 'string cannot be empty', spec: 'empty string' },
+      { value: '1a', n: 10, message: 'string must be convertible to a number', spec: 'non-numeric string' },
+      { value: ' 123 ', n: 10, message: 'string cannot contain spaces', spec: 'spaces' },
+      { value: '-123', n: 10, message: 'negative numbers are not allowed', spec: 'negative' },
+      { value: '123.45', n: 10, message: 'floating point numbers are not allowed', spec: 'floating point' },
+      { value: '123', n: 0, message: 'n must be between 1 and 36', spec: 'n = 0' },
+      { value: '123', n: 37, message: 'n must be between 1 and 36', spec: 'n = 37' },
+    ])('should throw error for $spec', ({ value, n, message }) => {
+      expect(() => generateModN(value, n)).toThrow(expect.objectContaining({ message }));
+    });
+  });
+
+  describe('when options.checkSumOnly is undefined/false', () => {
+    test.each([
+      { value: '0', n: 16, expected: '00' },
+      { value: '1', n: 10, expected: '18' },
+      { value: '1', n: 16, expected: '1E' },
+      { value: '16', n: 16, expected: '163' },
+      { value: '32', n: 16, expected: '329' },
+      { value: '123', n: 10, expected: '1230' },
+      { value: '7992739871', n: 10, expected: '79927398713' },
+    ])('should return $expected for ($value, $n)', ({ value, n, expected }) => {
+      const actual = generateModN(value, n);
+
+      expect(actual).toBe(expected);
+    });
+  });
+
+  describe('when options.checkSumOnly is true', () => {
+    const options = { checkSumOnly: true };
+
+    test.each([
+      { value: '0', n: 16, expected: '0' },
+      { value: '1', n: 16, expected: 'E' },
+      { value: '16', n: 16, expected: '3' },
+      { value: '32', n: 16, expected: '9' },
+      { value: '123', n: 10, expected: '0' },
+    ])('should return $expected for ($value, $n)', ({ value, n, expected }) => {
+      const actual = generateModN(value, n, options);
+
+      expect(actual).toBe(expected);
+    });
+  });
+
+  describe('edge cases', () => {
+    test('leading zero', () => {
+      expect(generateModN('0', 10)).toBe('00');
+    });
+
+    test('multiple leading zeros', () => {
+      expect(generateModN('00123', 10)).toBe('001230');
+    });
+
+    test('n=10 matches generate for various values', () => {
+      const values = ['1', '123', '7992739871'];
+
+      values.forEach((value) => {
+        expect(generateModN(value, 10)).toBe(luhn.generate(value));
+      });
+    });
+
+    test('n=1 always produces check char 0', () => {
+      expect(generateModN('1', 1)).toBe('10');
+      expect(generateModN('123', 1)).toBe('1230');
+    });
+
+    test('n=36 boundary', () => {
+      expect(generateModN('1', 36)).toBe('1Y');
+    });
+  });
+});
+
+describe('luhnModN', () => {
+  describe('check digit calculation', () => {
+    test.each([
+      { value: '12345', n: 10, expected: 5, spec: 'numeric strings' },
+      { value: 'A1B2C3', n: 10, expected: 2, spec: 'alphanumeric uppercase' },
+      { value: 'a1b2c3', n: 10, expected: 2, spec: 'alphanumeric lowercase' },
+      { value: '12345', n: 11, expected: 9, spec: 'different moduli' },
+      { value: '5', n: 10, expected: 9, spec: 'single character' },
+    ])('should return $expected for ($value, $n) - $spec', ({ value, n, expected }) => {
+      const actual = luhnModN(value, n);
+
+      expect(actual).toBe(expected);
+    });
+  });
+
+  describe('error handling', () => {
+    test.each([
+      { value: '123@45', n: 10, char: '@', spec: 'invalid character' },
+      { value: 'hello!', n: 10, char: '!', spec: 'special character' },
+    ])('should throw error for $spec', ({ value, n, char }) => {
+      expect(() => luhnModN(value, n)).toThrow(`Invalid character: ${char}`);
     });
   });
 });
