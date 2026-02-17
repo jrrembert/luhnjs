@@ -1,11 +1,7 @@
 const CODE_POINTS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-class GenerateOptions {
-  public checkSumOnly: boolean;
-
-  constructor() {
-    this.checkSumOnly = false;
-  }
+interface GenerateOptions {
+  checkSumOnly: boolean;
 }
 
 /**
