@@ -122,11 +122,11 @@ export function random(length: string): string {
   const lengthAsInteger = parseInt(length);
 
   if (lengthAsInteger > 100) {
-    throw new Error('string must be less than 100 characters');
+    throw new Error('length must be less than or equal to 100');
   }
 
   if (lengthAsInteger < 2) {
-    throw new Error('string must be greater than 1');
+    throw new Error('length must be greater than or equal to 2');
   }
 
   const random = Array.from({ length: lengthAsInteger - 1 }, (_, index) => {

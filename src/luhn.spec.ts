@@ -136,8 +136,8 @@ describe('random', () => {
     { length: undefined as any, message: 'value must be a string - received undefined', spec: 'string cannot be null/undefined' },
     { length: '', message: 'string cannot be empty', spec: 'string is empty' },
     { length: '1a', message: 'string must be convertible to a number', spec: 'string cannot be converted to a number' },
-    { length: '1', message: 'string must be greater than 1', spec: 'string has a length of 1' },
-    { length: '1'.repeat(99), message: 'string must be less than 100 characters', spec: 'string is longer than 100 characters' },
+    { length: '1', message: 'length must be greater than or equal to 2', spec: 'length is less than 2' },
+    { length: '101', message: 'length must be less than or equal to 100', spec: 'length is greater than 100' },
   ])('should throw error when $spec', ({ length, message }) => {
     const actual = () => luhn.random(length);
 
