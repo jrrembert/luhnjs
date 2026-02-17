@@ -40,6 +40,7 @@ Releases are fully automated via [semantic-release](https://github.com/semantic-
 - Never force push to protected branches (`main`, `rc`) without explicit approval from the repo admin
 - Every change must have a GitHub issue. If the user provides an issue number, use it. Otherwise, create one before starting work
 - Every PR must include `Closes #N` in the body to auto-close its issue on merge
+- **Note**: `Closes #N` only auto-closes when merging into the default branch (`main`). PRs targeting `rc` won't auto-close issues — include `Closes #N` in the release PR (`rc` → `main`) or close manually
 - Branch naming: use prefixes `feature/`, `fix/`, `chore/` (e.g., `feature/add-auth`, `fix/login-bug`)
 - Commits, PR titles, and issue titles follow conventional commit format: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`
 - Always merge PRs via GitHub UI or `gh pr merge` — never merge locally with `git merge` then push. Local merges break GitHub's `Closes #N` auto-close linking.
