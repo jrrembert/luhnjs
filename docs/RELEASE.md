@@ -246,7 +246,7 @@ Before creating a release:
 - [ ] All changes merged to `main`
 - [ ] `package.json` version updated
 - [ ] Version bump committed and pushed
-- [ ] CHANGELOG updated (if maintained)
+- [ ] CHANGELOG updated (run `yarn changelog`)
 - [ ] Git tag created with `v` prefix
 - [ ] Tag pushed to GitHub
 - [ ] GitHub Release created (triggers publish workflow)
@@ -290,23 +290,19 @@ Potential enhancements to the release process:
    - Add `npm version` script to handle package.json updates
    - Consider semantic-release for fully automated releases
 
-2. **Add CHANGELOG generation**
-   - Use conventional commits for automatic changelog
-   - Tools: `conventional-changelog` or `release-it`
-
-3. **Prepublish validation**
+2. **Prepublish validation**
    - Add `prepublishOnly` script to run tests before publish
    - Prevent publishing broken builds
 
-4. **Multi-registry support**
+3. **Multi-registry support**
    - Document GitHub Packages installation for consumers
    - Consider publishing to additional registries
 
-5. **Release notes automation**
+4. **Release notes automation**
    - Auto-generate from conventional commits
    - Include contributor attribution
 
-6. **Version 1.0.0 readiness**
+5. **Version 1.0.0 readiness**
    - Finalize API stability
    - Complete documentation
    - Full test coverage including experimental features
