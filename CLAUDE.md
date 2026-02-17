@@ -45,6 +45,7 @@ Releases are fully automated via [semantic-release](https://github.com/semantic-
 - PRs use the template at `.github/PULL_REQUEST_TEMPLATE.md` — fill in all sections (Summary, Changes, Test plan)
 - Use `/pr` or `/pr <issue-number>` to create pull requests with the standard format
 - Always create the feature branch from `rc` **before** writing code, not at commit time
+- Use a git worktree for implementation work (e.g., `git worktree add ../luhnjs-<name> <branch>`). This avoids issues with stale branch state in the main working directory
 
 This project follows Test-Driven Development (TDD). For every feature or bug fix:
 
