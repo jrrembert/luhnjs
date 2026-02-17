@@ -33,9 +33,9 @@ The project uses GitHub Actions for continuous integration with four automated w
 
 Tests across multiple Node.js versions for compatibility:
 
-- Node.js 14.x
-- Node.js 16.x
 - Node.js 18.x
+- Node.js 20.x
+- Node.js 22.x
 
 #### Steps
 
@@ -474,7 +474,7 @@ grep -r "uses: actions" .github/workflows/
 When adding new Node.js LTS versions:
 
 1. Edit `.github/workflows/node.js.yml`
-2. Add version to matrix: `node-version: [14.x, 16.x, 18.x, 20.x]`
+2. Add version to matrix: `node-version: [18.x, 20.x, 22.x]`
 3. Test locally with new version
 4. Consider removing EOL versions
 
@@ -510,20 +510,16 @@ As of February 2026:
    - Track performance over time
    - Alert on regressions
 
-3. **Automated dependency updates**
-   - Enable Dependabot for automated PR creation
-   - Auto-merge minor/patch updates if tests pass
-
-4. **Release automation**
+3. **Release automation**
    - Add `release-please` for automatic versioning
    - Generate changelogs from commits
    - Create releases automatically
 
-5. **Preview deployments**
+4. **Preview deployments**
    - Deploy documentation on PR preview
    - If adding examples, deploy to GitHub Pages
 
-6. **Notification improvements**
+5. **Notification improvements**
    - Slack/Discord notifications for failures
    - Only notify on main branch failures
    - Weekly summary reports
