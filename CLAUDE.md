@@ -19,7 +19,11 @@ yarn lint         # Lint with ESLint
 
 ## Releases
 
-Releases are fully automated via [semantic-release](https://github.com/semantic-release/semantic-release). When commits are merged to `main`, semantic-release analyzes commit messages and automatically determines the version bump, updates `CHANGELOG.md`, publishes to npm, and creates a GitHub Release. No manual versioning or publishing is needed. See `docs/RELEASE.md` for details.
+Releases are fully automated via [semantic-release](https://github.com/semantic-release/semantic-release). No manual versioning or publishing is needed. See `docs/RELEASE.md` for details.
+
+- **Release candidates**: Push `feat:`/`fix:` commits to the `rc` branch → publishes pre-release versions (e.g., `1.0.0-rc.1`)
+- **Stable releases**: Merge `rc` into `main` → publishes stable versions (e.g., `1.0.0`)
+- Every stable release must be preceded by at least one release candidate
 
 ## Architecture
 

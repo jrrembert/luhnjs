@@ -50,15 +50,48 @@ Only the `/dist` directory is included in published packages. Source TypeScript 
 
 ### Overview
 
-Releases are fully automated via [semantic-release](https://github.com/semantic-release/semantic-release). When commits are pushed to `main`, semantic-release:
+Releases are fully automated via [semantic-release](https://github.com/semantic-release/semantic-release). The project uses a two-phase release process:
+
+1. **Release candidates** — published from the `rc` branch for testing before a stable release
+2. **Stable releases** — published from `main` after RC validation
+
+No manual versioning, tagging, or publishing is needed.
+
+### Release Candidate Workflow
+
+Every stable release is preceded by one or more release candidates:
+
+1. Create the `rc` branch from `main`
+2. Push `feat:` or `fix:` commits to `rc`
+3. semantic-release publishes pre-release versions (e.g., `1.0.0-rc.1`, `1.0.0-rc.2`)
+4. Test the RC via `npm install @jrrembert/luhnjs@1.0.0-rc.1`
+5. When satisfied, merge `rc` into `main`
+6. semantic-release publishes the stable version (e.g., `1.0.0`)
+
+```bash
+# Create RC branch
+git checkout main
+git pull origin main
+git checkout -b rc
+
+# Push changes — semantic-release creates RC versions automatically
+git push -u origin rc
+
+# After validation, merge to main for stable release
+gh pr create --base main --head rc --title "Release v1.0.0"
+```
+
+**Version format**: RC versions follow semver pre-release format: `x.y.z-rc.N` (e.g., `1.0.0-rc.1`, `1.0.0-rc.2`). The stable release drops the pre-release suffix (e.g., `1.0.0`).
+
+### Stable Release Workflow
+
+When commits are merged to `main`, semantic-release:
 
 1. Analyzes commit messages to determine the version bump (major/minor/patch)
 2. Updates `package.json` version and `CHANGELOG.md`
 3. Publishes to npm
 4. Creates a GitHub Release with auto-generated release notes
 5. Commits the version bump and CHANGELOG back to the repository
-
-No manual versioning, tagging, or publishing is needed.
 
 ### How It Works
 
@@ -75,7 +108,7 @@ semantic-release uses [conventional commits](https://www.conventionalcommits.org
 
 #### Release Workflow
 
-The GitHub Actions workflow (`.github/workflows/release.yml`) runs on every push to `main`:
+The GitHub Actions workflow (`.github/workflows/release.yml`) runs on every push to `main` or `rc`:
 
 1. **Checkout** with full git history (`fetch-depth: 0`)
 2. **Setup Node.js** 22.x with yarn cache
