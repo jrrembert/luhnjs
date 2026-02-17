@@ -15,6 +15,7 @@ yarn test         # Run all tests
 yarn test src/luhn.spec.ts                # Run a single test file
 yarn test --testNamePattern="generate"    # Run tests matching a pattern
 yarn lint         # Lint with ESLint
+yarn changelog    # Generate/update CHANGELOG.md from conventional commits
 ```
 
 ## Architecture
