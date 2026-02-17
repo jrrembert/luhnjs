@@ -26,16 +26,29 @@ $ yarn add @jrrembert/luhnjs
 ### Usage
 
 ```typescript
-import { generate, validate, random } from '@jrrembert/luhnjs';
+import {
+  generate,
+  validate,
+  random,
+  generateModN,
+  validateModN,
+  checksumModN,
+} from '@jrrembert/luhnjs';
 
 // Generate a checksum
-generate('7992739871');    // '79927398713'
+generate('7992739871');               // '79927398713'
+generate('7992739871', { checkSumOnly: true }); // '3'
 
 // Validate a checksum
-validate('79927398713');   // true
+validate('79927398713');              // true
 
 // Generate a random number with valid checksum
-random('16');              // e.g. '4539148803436467'
+random('16');                         // e.g. '4539148803436467'
+
+// Mod-N variants (base 2–36, supports alphanumeric)
+generateModN('1', 16);               // '1E'
+validateModN('1E', 16);              // true
+checksumModN('12345', 10);           // 5
 ```
 
 ## Commands
