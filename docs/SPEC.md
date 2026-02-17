@@ -85,19 +85,44 @@ Luhn mod-N variant that computes a check character from an expanded alphabet.
 |---|---|
 | `n` <= 0 or `n` > 36 | `n must be between 1 and 36` |
 
-### `luhnModN(value, n) -> number`
+### `validateModN(value, n) -> boolean`
+
+Determine whether `value` has a valid Luhn mod-N check character as its last character.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `value` | `string` | yes | String where the last character is the check character |
+| `n` | `number` | yes | Modulus (1 to 36 inclusive) |
+
+**Returns:** `true` if the check character is valid, `false` otherwise.
+
+**Errors:**
+
+| Condition | Error message |
+|---|---|
+| Value is not a string | `value must be a string - received <value>` |
+| String is empty | `string cannot be empty` |
+| Length is 1 | `string must be longer than 1 character` |
+| `n` < 1 or `n` > 36 | `n must be between 1 and 36` |
+
+**Behavior:** Strips the last character (the check character), runs `generateModN` on the remainder, and compares the result to the original `value`.
+
+### `checksumModN(value, n) -> number`
 
 Lower-level mod-N check digit calculation. Accepts alphanumeric input (`0-9`, `A-Z`, `a-z`), returns the check digit as an integer.
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `value` | `string` | yes | Alphanumeric string |
-| `n` | `number` | yes | Modulus for the check digit calculation |
+| `n` | `number` | yes | Modulus (1 to 36 inclusive) |
 
 **Errors:**
 
 | Condition | Error message |
 |---|---|
+| Value is not a string | `value must be a string - received <value>` |
+| String is empty | `string cannot be empty` |
+| `n` < 1 or `n` > 36 | `n must be between 1 and 36` |
 | Character not in `0-9`, `A-Z`, `a-z` | `Invalid character: <char>` |
 
 ## 3. Algorithm
@@ -298,4 +323,4 @@ For `random`, the output is non-deterministic, so test the following properties:
 | Check digit range | `0-9` | Single decimal digit |
 | Leading zeros | Preserved | `"0"` -> `"00"`, `"00123"` -> `"001230"` |
 | `random` first digit | `1-9` | Never zero |
-| `CODE_POINTS` alphabet | `0-9A-Z` (36 chars) | Used by experimental mod-N API only |
+| `CODE_POINTS` alphabet | `0-9A-Z` (36 chars) | Used by public mod-N functions |

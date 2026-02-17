@@ -142,24 +142,6 @@ export function random(length: string): string {
 }
 
 /**
- * Compute a Luhn mod-N checksum for a numeric string using CODE_POINTS mapping
- */
-function generateModNChecksum(value: string, n: number): number {
-  const chars = Array.from(value);
-  let factor = 2;
-  let sum = 0;
-
-  for (let i = chars.length - 1; i >= 0; i--) {
-    let addend = CODE_POINTS.indexOf(chars[i].toUpperCase()) * factor;
-    addend = Math.floor(addend / n) + (addend % n);
-    sum += addend;
-    factor = factor === 2 ? 1 : 2;
-  }
-
-  return (n - (sum % n)) % n;
-}
-
-/**
  * Calculate and append a Luhn mod-N checksum to a numeric string
  *
  * @param value - Numeric string to generate checksum for
@@ -174,10 +156,39 @@ export function generateModN(value: string, n: number, options?: GenerateOptions
     throw new Error('n must be between 1 and 36');
   }
 
-  const checkSum = generateModNChecksum(value, n);
+  const checkSum = checksumModN(value, n);
   const checkChar = CODE_POINTS[checkSum];
 
   return options?.checkSumOnly ? checkChar : value.concat(checkChar);
+}
+
+/**
+ * Determine if the Luhn mod-N checksum for a given value is correct
+ *
+ * @param value - Numeric string where the last character is the check character
+ * @param n - Modulus (base) between 1 and 36
+ * @returns boolean indicating whether the checksum is valid
+ */
+export function validateModN(value: string, n: number): boolean {
+  if (typeof value !== 'string') {
+    throw new Error(`value must be a string - received ${value}`);
+  }
+
+  if (!value.length) {
+    throw new Error('string cannot be empty');
+  }
+
+  if (value.length === 1) {
+    throw new Error('string must be longer than 1 character');
+  }
+
+  if (n < 1 || n > 36) {
+    throw new Error('n must be between 1 and 36');
+  }
+
+  const valueWithoutCheckSum = value.substring(0, value.length - 1);
+
+  return value === generateModN(valueWithoutCheckSum, n);
 }
 
 /**
@@ -200,7 +211,19 @@ function charToInt(char: string): number {
  * @param n - Modulus (base) to use for the algorithm
  * @returns Check digit as a number
  */
-export function luhnModN(value: string, n: number): number {
+export function checksumModN(value: string, n: number): number {
+  if (typeof value !== 'string') {
+    throw new Error(`value must be a string - received ${value}`);
+  }
+
+  if (!value.length) {
+    throw new Error('string cannot be empty');
+  }
+
+  if (n < 1 || n > 36) {
+    throw new Error('n must be between 1 and 36');
+  }
+
   const chars = Array.from(value);
   let factor = 2;
   let sum = 0;

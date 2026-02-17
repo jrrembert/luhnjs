@@ -19,7 +19,7 @@ yarn lint         # Lint with ESLint
 
 ## Architecture
 
-- `index.ts` - Entry point re-exporting the public API: `generate`, `validate`, `random`, `generateModN`, `luhnModN`
+- `index.ts` - Entry point re-exporting the public API: `generate`, `validate`, `random`, `generateModN`, `validateModN`, `checksumModN`
 - `src/luhn.ts` - All algorithm implementations
 - `src/luhn.spec.ts` - Co-located Jest tests (ts-jest preset)
 
