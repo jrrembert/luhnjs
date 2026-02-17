@@ -500,26 +500,17 @@ As of February 2026:
 
 ### Planned Enhancements
 
-1. **Code coverage reporting**
-   - Add coverage generation to test step
-   - Upload to Codecov or Coveralls
-   - Add coverage badge to README
-
-2. **Performance benchmarking**
+1. **Performance benchmarking**
    - Add benchmark job for algorithm performance
    - Track performance over time
    - Alert on regressions
 
-3. **Release automation**
+2. **Release automation**
    - Add `release-please` for automatic versioning
    - Generate changelogs from commits
    - Create releases automatically
 
-4. **Preview deployments**
-   - Deploy documentation on PR preview
-   - If adding examples, deploy to GitHub Pages
-
-5. **Notification improvements**
+3. **Notification improvements**
    - Slack/Discord notifications for failures
    - Only notify on main branch failures
    - Weekly summary reports

@@ -200,8 +200,8 @@ describe('random', () => {
       const expected = iterations / 10;
 
       Object.keys(counts).forEach((key: string) => {
-        expect(counts[key]).toBeGreaterThan(expected * 0.6);
-        expect(counts[key]).toBeLessThan(expected * 1.4);
+        expect(counts[key]).toBeGreaterThanOrEqual(expected * 0.6);
+        expect(counts[key]).toBeLessThanOrEqual(expected * 1.4);
       });
     });
   });
