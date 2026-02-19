@@ -75,11 +75,11 @@ Luhn mod-N variant that computes a check character from an expanded alphabet.
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `value` | `string` | yes | Numeric string to compute a check character for |
+| `value` | `string` | yes | Alphanumeric string to compute a check character for |
 | `n` | `number` | yes | Modulus (1 to 36 inclusive, matching the `CODE_POINTS` alphabet `0-9A-Z`) |
 | `options.checkSumOnly` | `boolean` | no | Default `false`. When `true`, return only the check character |
 
-**Errors:** Same shared validation as `generate`, plus:
+**Errors:** Applies [mod-N input validation](#mod-n-input-validation) on `value`, plus:
 
 | Condition | Error message |
 |---|---|
@@ -96,12 +96,10 @@ Determine whether `value` has a valid Luhn mod-N check character as its last cha
 
 **Returns:** `true` if the check character is valid, `false` otherwise.
 
-**Errors:**
+**Errors:** Applies [mod-N input validation](#mod-n-input-validation) on `value` (including the check character), plus:
 
 | Condition | Error message |
 |---|---|
-| Value is not a string | `value must be a string - received <value>` |
-| String is empty | `string cannot be empty` |
 | Length is 1 | `string must be longer than 1 character` |
 | `n` < 1 or `n` > 36 | `n must be between 1 and 36` |
 
@@ -116,14 +114,11 @@ Lower-level mod-N check digit calculation. Accepts alphanumeric input (`0-9`, `A
 | `value` | `string` | yes | Alphanumeric string |
 | `n` | `number` | yes | Modulus (1 to 36 inclusive) |
 
-**Errors:**
+**Errors:** Applies [mod-N input validation](#mod-n-input-validation) on `value`, plus:
 
 | Condition | Error message |
 |---|---|
-| Value is not a string | `value must be a string - received <value>` |
-| String is empty | `string cannot be empty` |
 | `n` < 1 or `n` > 36 | `n must be between 1 and 36` |
-| Character not in `0-9`, `A-Z`, `a-z` | `Invalid character: <char>` |
 
 ## 3. Algorithm
 
@@ -220,6 +215,21 @@ All three public functions validate their input through a shared routine. Checks
 | `random` | Parsed integer > 100 | `string must be less than 100 characters` |
 | `random` | Parsed integer < 2 | `string must be greater than 1` |
 
+### Mod-N Input Validation
+
+The mod-N functions (`generateModN`, `validateModN`, `checksumModN`) use a separate validation routine tailored for alphanumeric input. Checks are applied **in order** — the first failing check returns an error and subsequent checks are skipped.
+
+| Order | Condition | Error message |
+|---|---|---|
+| 1 | Value is not a string | `value must be a string - received <value>` |
+| 2 | String is empty (length 0) | `string cannot be empty` |
+| 3 | String contains spaces | `string cannot contain spaces` |
+| 4 | Character not in valid `CODE_POINTS` for the given `n` | `invalid character: <char>` |
+
+> **Note:** The empty and spaces checks are shared with the base validation. The numeric-specific checks (negative, float, non-numeric) are replaced by per-character validation against the `CODE_POINTS` alphabet, since mod-N accepts alphanumeric input. Characters like `-` and `.` that would trigger specific errors in the base functions will produce the generic `invalid character` error in mod-N functions.
+>
+> For `validateModN`, the entire input string is validated (including the check character position) before processing.
+
 ## 5. Test Vectors
 
 Every port must pass all of the following test cases.
@@ -310,6 +320,19 @@ For `random`, the output is non-deterministic, so test the following properties:
 | `random` | `"1a"` | `string must be convertible to a number` |
 | `random` | `"1"` | `string must be greater than 1` |
 | `random` | `"1"` repeated 99 times | `string must be less than 100 characters` |
+| `generateModN` | `""`, n=10 | `string cannot be empty` |
+| `generateModN` | `" A "`, n=36 | `string cannot contain spaces` |
+| `generateModN` | `"A-B"`, n=36 | `invalid character: <->` |
+| `generateModN` | `"A.B"`, n=36 | `invalid character: <.>` |
+| `generateModN` | `"A!"`, n=36 | `invalid character: <!>` |
+| `generateModN` | `"A"`, n=10 | `invalid character: <A>` |
+| `validateModN` | `""`, n=10 | `string cannot be empty` |
+| `validateModN` | `"A"`, n=36 | `string must be longer than 1 character` |
+| `validateModN` | `" AB "`, n=36 | `string cannot contain spaces` |
+| `validateModN` | `"1a"`, n=10 | `invalid character: <a>` |
+| `checksumModN` | `""`, n=10 | `string cannot be empty` |
+| `checksumModN` | `" A "`, n=36 | `string cannot contain spaces` |
+| `checksumModN` | `"A!"`, n=36 | `invalid character: <!>` |
 
 ## 6. Constraints & Boundaries
 
