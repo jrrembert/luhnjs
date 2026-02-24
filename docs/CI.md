@@ -4,12 +4,14 @@ This document describes the CI/CD workflows configured for `@jrrembert/luhnjs`.
 
 ## Overview
 
-The project uses GitHub Actions for continuous integration with four automated workflows:
+The project uses GitHub Actions for continuous integration with six automated workflows:
 
 1. **Node.js CI** - Build, lint, and test on multiple Node versions
 2. **Dependency Review** - Security scanning for vulnerable dependencies
 3. **Release** - Automated versioning and npm publishing via semantic-release
-4. **Copyright Update** - Annual copyright year automation
+4. **Sync package.json version** - Updates `package.json` version after each release
+5. **Copyright Update** - Annual copyright year automation
+6. **PR Title Validation** - Enforces conventional commit format on PR titles
 
 ## Workflows
 
@@ -33,7 +35,6 @@ The project uses GitHub Actions for continuous integration with four automated w
 
 Tests across multiple Node.js versions for compatibility:
 
-- Node.js 18.x
 - Node.js 20.x
 - Node.js 22.x
 
@@ -57,7 +58,7 @@ Tests across multiple Node.js versions for compatibility:
 
 #### Success Criteria
 
-All three Node.js versions must:
+All Node.js versions must:
 - Install dependencies without errors
 - Pass linting checks
 - Build successfully
@@ -148,7 +149,28 @@ See [RELEASE.md](RELEASE.md) for detailed documentation.
 - **Authentication**: `NPM_TOKEN` secret, automatic `GITHUB_TOKEN`
 - **Skips release** if no `feat:` or `fix:` commits since last release
 
-### 4. Copyright Update
+### 4. Sync package.json version
+
+**File**: `.github/workflows/sync-version.yml`
+
+**Purpose**: Automatically creates a PR to update `package.json` version after each semantic-release publish.
+
+#### Triggers
+
+- **Release** `published` event (fires after semantic-release creates a GitHub Release)
+
+#### How It Works
+
+1. Extracts version from the release tag (strips `v` prefix)
+2. Updates `package.json` via `npm version --no-git-tag-version`
+3. Creates a PR via `peter-evans/create-pull-request@v7`
+4. Targets the branch the release was published from (`main` or `rc`)
+
+#### Why This Exists
+
+The `@semantic-release/git` plugin was removed because it can't push directly to protected branches. This workflow achieves the same result by creating a PR instead.
+
+### 5. Copyright Update
 
 **File**: `.github/workflows/update-copyright-date.yml`
 
@@ -179,6 +201,47 @@ If the automated update fails or needs to be run manually:
 ```bash
 ./update-copyright-date.sh README.md LICENSE
 ```
+
+### 5. PR Title Validation
+
+**File**: `.github/workflows/pr-title.yml`
+
+**Purpose**: Ensures all PR titles follow the [conventional commits](https://www.conventionalcommits.org/) format. Since PRs are squash-merged, the PR title becomes the final commit message that `semantic-release` uses to determine version bumps.
+
+#### Triggers
+
+- **Pull request target** events: `opened`, `edited`, `synchronize`
+- Runs on all PRs regardless of target branch
+
+#### How It Works
+
+Uses [amannn/action-semantic-pull-request](https://github.com/amannn/action-semantic-pull-request) to parse the PR title and enforce the format:
+
+```
+<type>: <description>
+```
+
+Valid types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`
+
+#### Examples
+
+| PR Title | Result |
+|---|---|
+| `feat: add checksumModN function` | ✅ Pass |
+| `fix: correct off-by-one in generate` | ✅ Pass |
+| `chore: update dependencies` | ✅ Pass |
+| `add new feature` | ❌ Fail |
+| `WIP: something` | ❌ Fail |
+
+#### Permissions
+
+- `pull-requests: read` - Read PR metadata to validate title
+
+#### Required Status Check
+
+This workflow is a required status check (`Validate PR title`) on both `main` and `rc`. PRs cannot be merged until the title passes validation.
+
+---
 
 ## CI Status Badges
 
@@ -385,7 +448,7 @@ Typical CI run times (per Node version):
 - Build: ~5-8s
 - Test: ~3-5s
 
-**Total**: ~1 minute per Node version (~3 minutes for full matrix)
+**Total**: ~1 minute per Node version (~2 minutes for full matrix)
 
 ### Caching
 
@@ -409,12 +472,14 @@ Workflows follow least-privilege principle:
 - **Node.js CI**: No special permissions needed
 - **Dependency Review**: `contents: read` only
 - **Release**: `contents: write`, `issues: write`, `pull-requests: write`, `packages: write`
+- **Sync package.json version**: `contents: write`, `pull-requests: write`
 - **Copyright Update**: `contents: write`, `pull-requests: write`
+- **PR Title Validation**: `pull-requests: read`
 
 ### Protected Branches
 
 Both `main` and `rc` have branch protection with required status checks:
-- `build (18.x)`, `build (20.x)`, `build (22.x)`, `dependency-review`
+- `build (20.x)`, `build (22.x)`, `dependency-review`, `Validate PR title`
 
 Workflows are designed to work with branch protection:
 - Copyright update creates a PR instead of pushing directly
@@ -451,27 +516,9 @@ grep -r "uses: actions" .github/workflows/
 When adding new Node.js LTS versions:
 
 1. Edit `.github/workflows/node.js.yml`
-2. Add version to matrix: `node-version: [18.x, 20.x, 22.x]`
+2. Add version to matrix: `node-version: [20.x, 22.x]`
 3. Test locally with new version
 4. Consider removing EOL versions
-
-## CI History
-
-### Workflow Evolution
-
-- **Initial setup** (2022): Basic Node.js CI with build and test
-- **Dependency review** (2022): Added security scanning
-- **Publish automation** (2022): Automated npm publishing
-- **Copyright automation** (2022): Annual copyright updates
-- **Matrix expansion** (2025): Updated branch triggers to include all prefixes
-
-### Recent Runs
-
-As of February 2026:
-- **Node.js CI**: 100% success rate on recent runs
-- **Dependency Review**: All PRs passing
-- **Release**: Adopted semantic-release (Feb 2026), replaces manual publish workflow
-- **Copyright Update**: Fixed in Feb 2026 to create PR instead of direct push
 
 ## Future Improvements
 
