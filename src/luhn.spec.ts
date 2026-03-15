@@ -211,10 +211,11 @@ describe('generateModN', () => {
   describe('input validation', () => {
     test.each([
       { value: '', n: 10, message: 'string cannot be empty', spec: 'empty string' },
-      { value: '1a', n: 10, message: 'string must be convertible to a number', spec: 'non-numeric string' },
-      { value: ' 123 ', n: 10, message: 'string cannot contain spaces', spec: 'spaces' },
-      { value: '-123', n: 10, message: 'negative numbers are not allowed', spec: 'negative' },
-      { value: '123.45', n: 10, message: 'floating point numbers are not allowed', spec: 'floating point' },
+      { value: ' A ', n: 36, message: 'string cannot contain spaces', spec: 'spaces' },
+      { value: 'A-B', n: 36, message: 'invalid character: <->', spec: 'invalid character dash' },
+      { value: 'A.B', n: 36, message: 'invalid character: <.>', spec: 'invalid character dot' },
+      { value: 'A!', n: 36, message: 'invalid character: <!>', spec: 'invalid character exclamation' },
+      { value: 'A', n: 10, message: 'invalid character: <A>', spec: 'invalid character for n=10' },
       { value: '123', n: 0, message: 'n must be between 1 and 36', spec: 'n = 0' },
       { value: '123', n: 37, message: 'n must be between 1 and 36', spec: 'n = 37' },
     ])('should throw error for $spec', ({ value, n, message }) => {
@@ -272,8 +273,8 @@ describe('generateModN', () => {
     });
 
     test('n=1 always produces check char 0', () => {
-      expect(generateModN('1', 1)).toBe('10');
-      expect(generateModN('123', 1)).toBe('1230');
+      expect(generateModN('0', 1)).toBe('00');
+      expect(generateModN('00', 1)).toBe('000');
     });
 
     test('n=36 boundary', () => {
@@ -286,8 +287,8 @@ describe('checksumModN', () => {
   describe('check digit calculation', () => {
     test.each([
       { value: '12345', n: 10, expected: 5, spec: 'numeric strings' },
-      { value: 'A1B2C3', n: 10, expected: 2, spec: 'alphanumeric uppercase' },
-      { value: 'a1b2c3', n: 10, expected: 2, spec: 'alphanumeric lowercase' },
+      { value: 'ABC', n: 36, expected: 17, spec: 'alphanumeric uppercase' },
+      { value: 'abc', n: 36, expected: 17, spec: 'alphanumeric lowercase' },
       { value: '12345', n: 11, expected: 9, spec: 'different moduli' },
       { value: '5', n: 10, expected: 9, spec: 'single character' },
     ])('should return $expected for ($value, $n) - $spec', ({ value, n, expected }) => {
@@ -317,10 +318,11 @@ describe('checksumModN', () => {
     });
 
     test.each([
-      { value: '123@45', n: 10, char: '@', spec: 'invalid character' },
-      { value: 'hello!', n: 10, char: '!', spec: 'special character' },
-    ])('should throw error for $spec', ({ value, n, char }) => {
-      expect(() => checksumModN(value, n)).toThrow(`Invalid character: ${char}`);
+      { value: '123@45', n: 10, message: 'invalid character: <@>', spec: 'invalid character' },
+      { value: 'ABC!', n: 36, message: 'invalid character: <!>', spec: 'special character' },
+      { value: ' A ', n: 36, message: 'string cannot contain spaces', spec: 'spaces' },
+    ])('should throw error for $spec', ({ value, n, message }) => {
+      expect(() => checksumModN(value, n)).toThrow(expect.objectContaining({ message }));
     });
   });
 });
@@ -331,7 +333,9 @@ describe('validateModN', () => {
       { value: null as any, n: 10, message: 'value must be a string - received null', spec: 'null input' },
       { value: undefined as any, n: 10, message: 'value must be a string - received undefined', spec: 'undefined input' },
       { value: '', n: 10, message: 'string cannot be empty', spec: 'empty string' },
-      { value: '1', n: 10, message: 'string must be longer than 1 character', spec: 'length 1' },
+      { value: '1', n: 36, message: 'string must be longer than 1 character', spec: 'length 1' },
+      { value: ' AB ', n: 36, message: 'string cannot contain spaces', spec: 'spaces' },
+      { value: '1a', n: 10, message: 'invalid character: <a>', spec: 'invalid character lowercase' },
     ])('should throw error for $spec', ({ value, n, message }) => {
       expect(() => validateModN(value, n)).toThrow(expect.objectContaining({ message }));
     });
