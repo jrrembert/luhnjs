@@ -204,6 +204,12 @@ describe('random', () => {
         expect(counts[key]).toBeLessThanOrEqual(expected * 1.4);
       });
     });
+
+    test('first digit is not zero', () => {
+      for (let i = 0; i < 100; i++) {
+        expect(luhn.random('10')[0]).not.toBe('0');
+      }
+    });
   });
 });
 
