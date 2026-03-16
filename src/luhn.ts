@@ -37,6 +37,34 @@ function handleErrors(value: string): void {
 }
 
 /**
+   * Validates that input is a non-empty string with valid characters for the given modulus
+   *
+   * @param value - String to validate
+   * @param n - Modulus (determines valid character set)
+   * @throws {Error} If value is not a string, is empty, contains spaces, or has invalid characters
+   */
+function handleModNErrors(value: unknown, n: number): void {
+  if (typeof value !== 'string') {
+    throw new Error(`value must be a string - received ${value}`);
+  }
+
+  if (!value.length) {
+    throw new Error('string cannot be empty');
+  }
+
+  if (value.includes(' ')) {
+    throw new Error('string cannot contain spaces');
+  }
+
+  const validChars = CODE_POINTS.slice(0, n);
+  for (const char of value) {
+    if (!validChars.includes(char.toUpperCase())) {
+      throw new Error(`invalid character: <${char}>`);
+    }
+  }
+}
+
+/**
  * Generates a Luhn algorithm checksum digit for a string of numbers
  *
  * @param value - String of digits to generate checksum for
@@ -118,11 +146,11 @@ export function random(length: string): string {
   const lengthAsInteger = parseInt(length);
 
   if (lengthAsInteger > 100) {
-    throw new Error('length must be less than or equal to 100');
+    throw new Error('string must be less than 100 characters');
   }
 
   if (lengthAsInteger < 2) {
-    throw new Error('length must be greater than or equal to 2');
+    throw new Error('string must be greater than 1');
   }
 
   const random = Array.from({ length: lengthAsInteger - 1 }, (_, index) => {
@@ -146,11 +174,11 @@ export function random(length: string): string {
  * @returns String containing either the checksum character alone or input with checksum appended
  */
 export function generateModN(value: string, n: number, options?: GenerateOptions): string {
-  handleErrors(value);
-
   if (n < 1 || n > 36) {
     throw new Error('n must be between 1 and 36');
   }
+
+  handleModNErrors(value, n);
 
   const checkSum = checksumModN(value, n);
   const checkChar = CODE_POINTS[checkSum];
@@ -166,20 +194,14 @@ export function generateModN(value: string, n: number, options?: GenerateOptions
  * @returns boolean indicating whether the checksum is valid
  */
 export function validateModN(value: string, n: number): boolean {
-  if (typeof value !== 'string') {
-    throw new Error(`value must be a string - received ${value}`);
+  if (n < 1 || n > 36) {
+    throw new Error('n must be between 1 and 36');
   }
 
-  if (!value.length) {
-    throw new Error('string cannot be empty');
-  }
+  handleModNErrors(value, n);
 
   if (value.length === 1) {
     throw new Error('string must be longer than 1 character');
-  }
-
-  if (n < 1 || n > 36) {
-    throw new Error('n must be between 1 and 36');
   }
 
   const valueWithoutCheckSum = value.substring(0, value.length - 1);
@@ -194,7 +216,7 @@ function charToInt(char: string): number {
   const index = CODE_POINTS.indexOf(char.toUpperCase());
 
   if (index === -1) {
-    throw new Error(`Invalid character: ${char}`);
+    throw new Error(`invalid character: <${char}>`);
   }
 
   return index;
@@ -208,17 +230,11 @@ function charToInt(char: string): number {
  * @returns Check digit as a number
  */
 export function checksumModN(value: string, n: number): number {
-  if (typeof value !== 'string') {
-    throw new Error(`value must be a string - received ${value}`);
-  }
-
-  if (!value.length) {
-    throw new Error('string cannot be empty');
-  }
-
   if (n < 1 || n > 36) {
     throw new Error('n must be between 1 and 36');
   }
+
+  handleModNErrors(value, n);
 
   const chars = Array.from(value);
   let factor = 2;
