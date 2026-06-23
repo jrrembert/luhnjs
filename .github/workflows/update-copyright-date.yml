@@ -13,7 +13,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Update copyright years
         run: ./update-copyright-date.sh README.md LICENSE
       - name: Create pull request
