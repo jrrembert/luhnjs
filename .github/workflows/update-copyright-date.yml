@@ -3,7 +3,9 @@ name: update copyright date
 on:
   schedule:
     # At the beginning of every year.
-    - cron: "0 0 1 1 *"
+    - cron: "1 0 1 1 *"
+    # Run again if first fails and I'm lazy.
+    - cron: "0 0 2 1 *"
 
 jobs:
   update-copyright:
