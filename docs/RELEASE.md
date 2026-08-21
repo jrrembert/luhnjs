@@ -129,10 +129,36 @@ semantic-release is configured in `.releaserc.json` with these plugins:
 
 ### Environment Requirements
 
-The release workflow requires these secrets:
+The release workflow uses short-lived OIDC credentials instead of a long-lived
+npm token:
 
-- `NPM_TOKEN` — npm publish authentication (configured in repository settings)
-- `GITHUB_TOKEN` — automatic, provided by GitHub Actions
+- npm must have a trusted publisher configured for the
+  `jrrembert/luhnjs` repository and `release.yml` workflow.
+- `.github/workflows/release.yml` must retain the `id-token: write` permission.
+- `GITHUB_TOKEN` is provided automatically by GitHub Actions.
+
+No manually configured repository secret is required for npm publishing.
+
+#### Configure Trusted Publishing
+
+Before the first release, or when repairing release authentication:
+
+1. Sign in to npm as a maintainer of
+   [`@jrrembert/luhnjs`](https://www.npmjs.com/package/@jrrembert/luhnjs).
+2. Open the package's **Settings** tab and find **Trusted publishing**.
+3. Select **GitHub Actions** and enter:
+   - **Organization or user**: `jrrembert`
+   - **Repository**: `luhnjs`
+   - **Workflow filename**: `release.yml` (filename only)
+   - **Environment name**: leave blank
+   - **Allowed actions**: `npm publish`
+4. Save the configuration.
+
+The values are case-sensitive. npm validates them only when the workflow
+attempts to publish, so double-check them against
+`.github/workflows/release.yml`. See npm's
+[trusted publishing documentation](https://docs.npmjs.com/trusted-publishers/)
+for current requirements.
 
 ### Verification
 
@@ -199,9 +225,13 @@ yarn build
 
 **Problem**: npm publish fails with authentication error
 
-- Verify `NPM_TOKEN` secret is configured in repository settings
-- Token must have publish permissions for `@jrrembert` scope
-- Generate new token at https://www.npmjs.com/settings/~/tokens
+- Verify the npm trusted publisher uses `jrrembert`, `luhnjs`, and
+  `release.yml` exactly.
+- Verify the trusted publisher allows the `npm publish` action.
+- Verify `.github/workflows/release.yml` grants `id-token: write` and still
+  uses a GitHub-hosted runner.
+- Confirm the package's `repository.url` still points to
+  `https://github.com/jrrembert/luhnjs.git`.
 
 **Problem**: Release creates wrong version bump
 
