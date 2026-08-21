@@ -146,7 +146,7 @@ See [RELEASE.md](RELEASE.md) for detailed documentation.
 - **Node version**: 22.x
 - **Steps**: lint → build → test → `npx semantic-release`
 - **Publishes to**: npm (https://registry.npmjs.org)
-- **Authentication**: `NPM_TOKEN` secret, automatic `GITHUB_TOKEN`
+- **Authentication**: npm trusted publishing (OIDC), automatic `GITHUB_TOKEN`
 - **Skips release** if no `feat:` or `fix:` commits since last release
 
 ### 4. Sync package.json version
@@ -415,28 +415,48 @@ gh run rerun <run-id> --failed
 gh run rerun <run-id>
 ```
 
-### Secrets Management
+### Release Authentication
 
 #### Required Secrets
 
-- `NPM_TOKEN` - npm publish authentication (configured in repository settings)
+No manually configured repository secrets are required for releases:
 
-#### Checking Secrets
+- GitHub provides `GITHUB_TOKEN` automatically.
+- npm authenticates the release workflow through a trusted publisher using
+  short-lived OIDC credentials.
+
+#### Configure the npm Trusted Publisher
+
+Before the first release, or when repairing release authentication:
+
+1. Sign in to npm as a maintainer of
+   [`@jrrembert/luhnjs`](https://www.npmjs.com/package/@jrrembert/luhnjs).
+2. Open the package's **Settings** tab and find **Trusted publishing**.
+3. Select **GitHub Actions** and enter:
+   - **Organization or user**: `jrrembert`
+   - **Repository**: `luhnjs`
+   - **Workflow filename**: `release.yml` (filename only)
+   - **Environment name**: leave blank
+   - **Allowed actions**: `npm publish`
+4. Save the trusted publisher configuration.
+5. Confirm `.github/workflows/release.yml` retains the `id-token: write`
+   permission.
+
+See npm's
+[trusted publishing documentation](https://docs.npmjs.com/trusted-publishers/)
+for current requirements. The configured repository and workflow filename are
+case-sensitive and must match exactly.
+
+#### Checking Repository Secrets
+
+Repository secrets are not readable, but you can list their names:
 
 ```bash
-# Secrets are not readable, but you can list configured ones
 gh secret list
 ```
 
-#### Updating Secrets
-
-```bash
-# Set secret via CLI
-gh secret set NPM_TOKEN
-
-# Or via GitHub UI:
-# Settings > Secrets and variables > Actions > New repository secret
-```
+The npm trusted publisher is managed on npmjs.com, not in GitHub repository
+secrets, so it does not appear in this list.
 
 ## Performance Optimization
 
