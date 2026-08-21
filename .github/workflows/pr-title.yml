@@ -21,6 +21,7 @@ jobs:
           types: |
             feat
             fix
+            ci
             chore
             docs
             refactor
