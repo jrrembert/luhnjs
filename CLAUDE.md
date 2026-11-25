@@ -74,3 +74,10 @@ ESLint enforces: single quotes, 2-space indentation, semicolons required, traili
 
 - When making changes that affect setup, build, or test commands, update both this file and `README.md`
 - Project specification lives in `docs/SPEC.md` — update when requirements or architecture change
+
+## Development and release runtime
+
+The published library supports Node.js 22 and later. Installing development
+dependencies and running semantic-release 26 requires Node.js 26.13 or later.
+CI installs with Node.js 26.13.1, then runs lint, build, and tests on both
+Node.js 22 and 26. The release job uses Node.js 26.13.1.

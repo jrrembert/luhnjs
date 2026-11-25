@@ -11,7 +11,7 @@ Published as [`@jrrembert/luhnjs`](https://www.npmjs.com/package/@jrrembert/luhn
 
 ### Prerequisites
 
-Install [Node.js](https://nodejs.org/) (>=20.x) and [Yarn](https://yarnpkg.com/).
+Install [Node.js](https://nodejs.org/) (>=22.x) and [Yarn](https://yarnpkg.com/).
 
 ### Installation
 
@@ -85,3 +85,11 @@ Email: [J. Ryan Rembert](mailto:j.ryan.rembert@gmail.com)
 [MIT](LICENSE)
 
 Copyright © 2022-2026 J. Ryan Rembert
+
+
+## Development and release runtime
+
+The published library supports Node.js 22 and later. Installing development
+dependencies and running semantic-release 26 requires Node.js 26.13 or later.
+CI installs with Node.js 26.13.1, then runs lint, build, and tests on both
+Node.js 22 and 26. The release job uses Node.js 26.13.1.
